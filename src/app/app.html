@@ -1,0 +1,309 @@
+<main class="dashboard-shell" [class.sidebar-collapsed]="sidebarCollapsed()">
+  @if (sidebarCollapsed()) {
+    <button class="menu-toggle floating" type="button" (click)="toggleSidebar()" aria-label="Mostrar panel lateral">
+      Menu
+    </button>
+  }
+
+  @if (!sidebarCollapsed()) {
+  <aside class="sidebar" aria-label="Navegacion principal">
+    <div class="brand">
+      <span class="brand-mark">LB</span>
+      <div>
+        <strong>La Bienvenida</strong>
+        <span>Panel de protectora</span>
+      </div>
+    </div>
+
+    <button class="menu-toggle" type="button" (click)="toggleSidebar()" aria-label="Ocultar panel lateral">
+      Guardar panel
+    </button>
+
+    <nav>
+      <a class="active" href="#animals">Animales</a>
+      <a href="#requests">Solicitudes</a>
+      <a href="#fosters">Acogidas</a>
+      <a href="#settings">Ajustes</a>
+    </nav>
+  </aside>
+  }
+
+  <section class="workspace">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Gestion interna</p>
+        <h1>Dashboard de animales</h1>
+        <p class="subtitle">Alta, seguimiento y estado de adopcion de los animales de la protectora.</p>
+      </div>
+      <button class="primary-action" type="button" (click)="resetForm()">Nuevo animal</button>
+    </header>
+
+    <section class="metrics" aria-label="Resumen de animales">
+      <article>
+        <span>Total</span>
+        <strong>{{ animals().length }}</strong>
+        <small>Animales registrados</small>
+      </article>
+      <article>
+        <span>Disponibles</span>
+        <strong>{{ availableCount() }}</strong>
+        <small>Listos para adoptar</small>
+      </article>
+      <article>
+        <span>Reservados</span>
+        <strong>{{ reservedCount() }}</strong>
+        <small>Con proceso abierto</small>
+      </article>
+      <article>
+        <span>Cuidados</span>
+        <strong>{{ medicalCount() }}</strong>
+        <small>Seguimiento veterinario</small>
+      </article>
+    </section>
+
+    <div class="content-grid">
+      <section class="panel form-panel" aria-labelledby="animal-form-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">{{ editingId() ? 'Editar ficha' : 'Nueva ficha' }}</p>
+            <h2 id="animal-form-title">{{ editingId() ? 'Actualizar animal' : 'Anadir animal' }}</h2>
+          </div>
+          @if (editingId()) {
+            <button class="ghost-button" type="button" (click)="resetForm()">Cancelar</button>
+          }
+        </div>
+
+        <form (ngSubmit)="saveAnimal()" #animalForm="ngForm">
+          <label>
+            Nombre
+            <input
+              name="name"
+              required
+              [ngModel]="form().name"
+              (ngModelChange)="updateForm('name', $event)"
+              placeholder="Ej. Lola"
+            />
+          </label>
+
+          <div class="field-row">
+            <label>
+              Especie
+              <select name="species" [ngModel]="form().species" (ngModelChange)="updateForm('species', $event)">
+                <option>Perro</option>
+                <option>Gato</option>
+                <option>Conejo</option>
+                <option>Ave</option>
+                <option>Otro</option>
+              </select>
+            </label>
+            <label>
+              Raza
+              <input
+                name="breed"
+                required
+                [ngModel]="form().breed"
+                (ngModelChange)="updateForm('breed', $event)"
+                placeholder="Mestizo, podenco..."
+              />
+            </label>
+          </div>
+
+          <div class="field-row three">
+            <label>
+              Edad
+              <input
+                name="age"
+                required
+                min="0"
+                type="number"
+                [ngModel]="form().age"
+                (ngModelChange)="updateForm('age', $event === '' ? null : +$event)"
+              />
+            </label>
+            <label>
+              Sexo
+              <select name="sex" [ngModel]="form().sex" (ngModelChange)="updateForm('sex', $event)">
+                <option>Hembra</option>
+                <option>Macho</option>
+              </select>
+            </label>
+            <label>
+              Tamano
+              <select name="size" [ngModel]="form().size" (ngModelChange)="updateForm('size', $event)">
+                <option>Pequeno</option>
+                <option>Mediano</option>
+                <option>Grande</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="field-row">
+            <label>
+              Estado
+              <select name="status" [ngModel]="form().status" (ngModelChange)="updateForm('status', $event)">
+                <option value="available">Disponible para adoptar</option>
+                <option value="reserved">Reservado</option>
+                <option value="adopted">Adoptado</option>
+                <option value="medical">En cuidados medicos</option>
+              </select>
+            </label>
+            <label>
+              Fecha de entrada
+              <input
+                name="arrivalDate"
+                type="date"
+                [ngModel]="form().arrivalDate"
+                (ngModelChange)="updateForm('arrivalDate', $event)"
+              />
+            </label>
+          </div>
+
+          <label>
+            Ubicacion
+            <input
+              name="location"
+              [ngModel]="form().location"
+              (ngModelChange)="updateForm('location', $event)"
+              placeholder="Refugio, casa de acogida..."
+            />
+          </label>
+
+          <label>
+            Descripcion
+            <textarea
+              name="description"
+              required
+              rows="4"
+              [ngModel]="form().description"
+              (ngModelChange)="updateForm('description', $event)"
+              placeholder="Caracter, necesidades, compatibilidades..."
+            ></textarea>
+          </label>
+
+          <label>
+            Notas internas
+            <textarea
+              name="notes"
+              rows="3"
+              [ngModel]="form().notes"
+              (ngModelChange)="updateForm('notes', $event)"
+              placeholder="Vacunas, esterilizacion, tratamientos, contacto..."
+            ></textarea>
+          </label>
+
+          <div class="photo-field">
+            <label for="animal-photos">Fotos de la mascota</label>
+            <input id="animal-photos" type="file" accept="image/*" multiple (change)="addPhotos($event)" />
+            <span>Puedes seleccionar varias imagenes a la vez.</span>
+
+            @if (form().photos.length) {
+              <div class="photo-preview-grid" aria-label="Fotos seleccionadas">
+                @for (photo of form().photos; track photo; let index = $index) {
+                  <figure>
+                    <img [src]="photo" alt="Foto seleccionada de la mascota" />
+                    <button type="button" (click)="removePhoto(index)" aria-label="Quitar foto">Quitar</button>
+                  </figure>
+                }
+              </div>
+            }
+          </div>
+
+          <button class="submit-button" type="submit" [disabled]="animalForm.invalid">
+            {{ editingId() ? 'Guardar cambios' : 'Registrar animal' }}
+          </button>
+        </form>
+      </section>
+
+      <section class="panel list-panel" id="animals" aria-labelledby="animal-list-title">
+        <div class="panel-heading list-heading">
+          <div>
+            <p class="eyebrow">Inventario</p>
+            <h2 id="animal-list-title">Animales registrados</h2>
+          </div>
+          <div class="filters">
+            <input
+              type="search"
+              placeholder="Buscar por nombre, raza..."
+              [ngModel]="searchTerm()"
+              (ngModelChange)="searchTerm.set($event)"
+              aria-label="Buscar animales"
+            />
+            <select
+              [ngModel]="statusFilter()"
+              (ngModelChange)="statusFilter.set($event)"
+              aria-label="Filtrar por estado"
+            >
+              <option value="all">Todos</option>
+              <option value="available">Disponibles</option>
+              <option value="reserved">Reservados</option>
+              <option value="adopted">Adoptados</option>
+              <option value="medical">En cuidados</option>
+            </select>
+          </div>
+        </div>
+
+        @if (filteredAnimals().length) {
+          <div class="animal-list">
+            @for (animal of filteredAnimals(); track animal.id) {
+              <article class="animal-card">
+                <div class="animal-avatar" aria-hidden="true">{{ animal.name.charAt(0) }}</div>
+                <div class="animal-main">
+                  <div class="animal-title">
+                    <div>
+                      <h3>{{ animal.name }}</h3>
+                      <p>{{ animal.species }} · {{ animal.breed }} · {{ animal.age }} anos</p>
+                    </div>
+                    <span class="status-pill" [class]="animal.status">{{ statusLabel(animal.status) }}</span>
+                  </div>
+
+                  <p class="description">{{ animal.description }}</p>
+
+                  @if (animal.photos.length) {
+                    <div class="animal-gallery" aria-label="Fotos de {{ animal.name }}">
+                      @for (photo of animal.photos; track photo; let index = $index) {
+                        <img [src]="photo" alt="Foto {{ index + 1 }} de {{ animal.name }}" />
+                      }
+                    </div>
+                  }
+
+                  <dl class="animal-details">
+                    <div>
+                      <dt>Sexo</dt>
+                      <dd>{{ animal.sex }}</dd>
+                    </div>
+                    <div>
+                      <dt>Tamano</dt>
+                      <dd>{{ animal.size }}</dd>
+                    </div>
+                    <div>
+                      <dt>Entrada</dt>
+                      <dd>{{ animal.arrivalDate }}</dd>
+                    </div>
+                    <div>
+                      <dt>Ubicacion</dt>
+                      <dd>{{ animal.location }}</dd>
+                    </div>
+                  </dl>
+
+                  @if (animal.notes) {
+                    <p class="notes">Nota interna: {{ animal.notes }}</p>
+                  }
+
+                  <div class="card-actions">
+                    <button type="button" (click)="editAnimal(animal)">Editar</button>
+                    <button class="danger" type="button" (click)="removeAnimal(animal.id)">Eliminar</button>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <strong>No hay animales con esos filtros.</strong>
+            <span>Prueba otra busqueda o registra una nueva ficha.</span>
+          </div>
+        }
+      </section>
+    </div>
+  </section>
+</main>
