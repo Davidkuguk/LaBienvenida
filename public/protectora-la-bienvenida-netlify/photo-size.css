@@ -1,0 +1,1 @@
+.profile-hero{grid-template-columns:.78fr 1.22fr}.profile-image img{object-position:center}@media(max-width:850px){.profile-hero{grid-template-columns:1fr}.profile-image{min-height:440px;max-height:560px}}

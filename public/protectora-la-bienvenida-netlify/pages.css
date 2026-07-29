@@ -1,0 +1,19 @@
+.nav>a.active:not(.button):after{width:100%}
+.page-section{min-height:calc(100vh - 84px)}
+.intro h1,.section-heading h1,.help h1,.contact-intro h1,.story-band h2{font-family:var(--serif);font-weight:600;line-height:1.04;letter-spacing:-2px}
+.intro h1,.section-heading h1,.help h1{font-size:clamp(42px,5.2vw,72px);margin:20px 0}
+.intro h1 em{color:#f09a6f}
+.story-band{padding:110px 8vw;background:var(--green);color:#fff}
+.story-band h2{font-size:clamp(38px,4.5vw,64px);max-width:900px;margin:22px 0}
+.story-band p{max-width:720px;color:#dbe5df;font-size:18px;line-height:1.7}
+.contact-page{padding:110px 8vw 130px;background:var(--cream);min-height:calc(100vh - 84px)}
+.contact-intro{max-width:850px}
+.contact-intro h1{font-size:clamp(48px,6vw,82px);margin:22px 0}
+.contact-intro p{font-size:19px;line-height:1.7;color:#5c6c67;max-width:650px}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;margin-top:80px;border-top:1px solid #b5bcae}
+.contact-grid div{padding:35px 5vw 35px 0;border-bottom:1px solid #b5bcae}
+.contact-grid span{display:block;text-transform:uppercase;font-size:11px;letter-spacing:1.5px;font-weight:700;margin-bottom:14px;color:#718079}
+.contact-grid a{font-family:var(--serif);font-size:23px}
+.contact-grid p{margin:0;line-height:1.7}
+.animals.page-section{padding-top:90px}
+@media(max-width:850px){.page-section{min-height:auto}.contact-page{padding:80px 6vw}.contact-grid{grid-template-columns:1fr;margin-top:50px}.story-band{padding:80px 6vw}.animals.page-section{padding-top:70px}}

@@ -2,6 +2,19 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.15.
 
+## Sitio público de la protectora
+
+El sitio estático de `protectora-la-bienvenida-netlify` forma parte de este proyecto en
+`public/protectora-la-bienvenida-netlify`. Angular lo copia íntegramente al compilar.
+
+Con el servidor de desarrollo iniciado, está disponible en:
+
+```text
+http://localhost:4200/protectora-la-bienvenida-netlify/index.html
+```
+
+El panel principal también incluye el enlace **Ver sitio público** en su navegación lateral.
+
 ## Development server
 
 To start a local development server, run:

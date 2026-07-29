@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Protectora La Bienvenida. Adopta, acoge o colabora con nuestros animales en Ciudad Real." />
+  <title>La Bienvenida · Protectora de Animales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="catalog.css" />
+  <link rel="stylesheet" href="hero-mobile.css" />
+</head>
+<body>
+  <header class="site-header" id="inicio">
+    <a class="brand" href="index.html" aria-label="La Bienvenida, inicio">
+      <span class="brand-mark" aria-hidden="true">♥</span>
+      <span><strong>La Bienvenida</strong><small>Protectora de animales</small></span>
+    </a>
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰</button>
+    <nav class="nav" aria-label="Navegación principal">
+      <a href="adopta.html">Adopta</a><a href="nosotros.html">Nosotros</a><a href="ayuda.html">Cómo ayudar</a><a href="contacto.html">Contacto</a>
+      <a class="button button-small" href="ayuda.html#donar">Donar</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <img src="./assets/hero-refugio.jpg" alt="Un perro y un gato rescatados descansan juntos en la puerta del refugio" fetchpriority="high" />
+      <div class="hero-overlay"></div>
+      <div class="hero-content reveal">
+        <span class="eyebrow">Ciudad Real · Desde 1994</span>
+        <h1>Una segunda oportunidad empieza con un <em>hola.</em></h1>
+        <p>Rescatamos, cuidamos y encontramos familias para animales que solo necesitan volver a confiar.</p>
+        <div class="hero-actions"><a class="button" href="adopta.html">Conoce a tu compañero</a><a class="text-link" href="ayuda.html">Quiero ayudar <span>→</span></a></div>
+      </div>
+      <div class="hero-note"><strong>280</strong><span>vidas a nuestro cuidado<br>cada día</span></div>
+    </section>
+
+    <section class="intro" id="nosotros">
+      <div class="section-label">Nuestra razón de ser</div>
+      <div class="intro-copy reveal"><h2>No buscamos casas.<br><em>Buscamos hogares.</em></h2><p>En La Bienvenida cada animal tiene un nombre, una historia y el tiempo que necesite. Somos una asociación sin ánimo de lucro sostenida por personas que creen que cuidar también cambia el mundo.</p></div>
+      <div class="stats">
+        <div><strong>230</strong><span>perros acogidos</span></div><div><strong>50</strong><span>gatos protegidos</span></div><div><strong>100%</strong><span>compromiso</span></div>
+      </div>
+    </section>
+
+    <section class="animals" id="adopta">
+      <div class="section-heading reveal"><div><span class="eyebrow">Esperando conocerte</span><h2>¿Quién te está<br>esperando?</h2></div><p>No eliges solo por una foto. Te ayudamos a encontrar el carácter y la energía que encajan con tu vida.</p></div>
+      <div class="catalog-toolbar"><div class="filters" role="group" aria-label="Filtrar animales"><button class="filter active" data-filter="all">Todos</button><button class="filter" data-filter="perro">Perros</button><button class="filter" data-filter="gato">Gatos</button></div><p class="animal-count" aria-live="polite">9 animales</p></div>
+      <div class="animal-grid">
+        <article class="animal-card reveal" data-type="perro"><div class="photo"><img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85" alt="Milo, perro mestizo color miel" loading="lazy"><span>Urgente</span></div><div class="animal-info"><div><h3>Milo</h3><p>3 años · Macho · Mediano · Cariñoso</p></div><button class="circle-button" aria-label="Conocer a Milo">↗</button></div></article>
+        <article class="animal-card reveal" data-type="gato"><div class="photo"><img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85" alt="Luna, gata atigrada" loading="lazy"></div><div class="animal-info"><div><h3>Luna</h3><p>2 años · Hembra · Tranquila · Curiosa</p></div><button class="circle-button" aria-label="Conocer a Luna">↗</button></div></article>
+        <article class="animal-card reveal" data-type="perro"><div class="photo"><img src="https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=900&q=85" alt="Bruno, perro pequeño de pelo claro" loading="lazy"><span>Veterano</span></div><div class="animal-info"><div><h3>Bruno</h3><p>8 años · Macho · Pequeño · Leal</p></div><button class="circle-button" aria-label="Conocer a Bruno">↗</button></div></article>
+        <article class="animal-card reveal" data-type="gato"><div class="photo"><img src="https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=900&q=85" alt="Nala, gata de pelo largo" loading="lazy"><span>Recién llegada</span></div><div class="animal-info"><div><h3>Nala</h3><p>1 año · Hembra · Joven · Dulce</p></div><button class="circle-button" aria-label="Conocer a Nala">↗</button></div></article>
+        <article class="animal-card reveal" data-type="perro"><div class="photo"><img src="https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?auto=format&fit=crop&w=900&q=85" alt="Roco, perro mestizo marrón" loading="lazy"></div><div class="animal-info"><div><h3>Roco</h3><p>5 años · Macho · Grande · Noble</p></div><button class="circle-button" aria-label="Conocer a Roco">↗</button></div></article>
+        <article class="animal-card reveal" data-type="gato"><div class="photo"><img src="https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=900&q=85" alt="Simba, gato joven de ojos verdes" loading="lazy"></div><div class="animal-info"><div><h3>Simba</h3><p>3 años · Macho · Sociable · Juguetón</p></div><button class="circle-button" aria-label="Conocer a Simba">↗</button></div></article>
+        <article class="animal-card reveal" data-type="perro"><div class="photo"><img src="https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=900&q=85" alt="Kira, perra de orejas grandes" loading="lazy"><span>Casa de acogida</span></div><div class="animal-info"><div><h3>Kira</h3><p>4 años · Hembra · Mediana · Activa</p></div><button class="circle-button" aria-label="Conocer a Kira">↗</button></div></article>
+        <article class="animal-card reveal" data-type="gato"><div class="photo"><img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=900&q=85" alt="Coco, gato naranja tumbado" loading="lazy"></div><div class="animal-info"><div><h3>Coco</h3><p>6 años · Macho · Tranquilo · Mimoso</p></div><button class="circle-button" aria-label="Conocer a Coco">↗</button></div></article>
+        <article class="animal-card reveal" data-type="perro"><div class="photo"><img src="https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=900&q=85" alt="Duna, perra mestiza de color canela" loading="lazy"></div><div class="animal-info"><div><h3>Duna</h3><p>2 años · Hembra · Mediana · Alegre</p></div><button class="circle-button" aria-label="Conocer a Duna">↗</button></div></article>
+      </div>
+      <a class="all-link" href="mailto:petercanespejos@gmail.com?subject=Quiero%20adoptar">¿No sabes cuál encaja contigo? Te ayudamos <span>→</span></a>
+    </section>
+
+    <section class="process">
+      <div class="section-label">Adopción responsable</div><h2 class="reveal">Un proceso sencillo.<br>Una decisión para siempre.</h2>
+      <div class="steps"><div><span>01</span><h3>Nos escribes</h3><p>Cuéntanos cómo es tu día a día y qué compañero imaginas.</p></div><div><span>02</span><h3>Os conocéis</h3><p>Visitamos el refugio juntos, sin prisas ni expectativas.</p></div><div><span>03</span><h3>Te acompañamos</h3><p>Formalizamos la adopción y seguimos cerca durante la adaptación.</p></div></div>
+    </section>
+
+    <section class="help" id="ayuda">
+      <div class="help-photo"><img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1200&q=85" alt="Voluntarios colaborando juntos" loading="lazy"></div>
+      <div class="help-content reveal"><span class="eyebrow">También puedes formar parte</span><h2>Hay muchas formas de abrir la puerta.</h2><p>No todo el mundo puede adoptar. Pero cada paseo, cada acogida y cada euro hace que el refugio siga siendo un lugar seguro.</p><div class="help-links"><a href="mailto:petercanespejos@gmail.com?subject=Quiero%20ser%20voluntario"><span>Hazte voluntario</span><b>→</b></a><a href="mailto:petercanespejos@gmail.com?subject=Quiero%20acoger"><span>Sé casa de acogida</span><b>→</b></a><a href="#donar"><span>Haz una donación</span><b>→</b></a></div></div>
+    </section>
+
+    <section class="donate" id="donar"><span class="eyebrow">Tu ayuda llega entera</span><h2>Un pequeño gesto.<br><em>Una vida enorme.</em></h2><p>Elige una aportación orientativa y te indicamos cómo realizarla de forma segura.</p><div class="amounts"><button>5 €</button><button class="selected">15 €</button><button>30 €</button><button>Otra</button></div><a class="button button-light" id="donate-button" href="mailto:petercanespejos@gmail.com?subject=Quiero%20donar%2015%E2%82%AC">Quiero ayudar con 15 €</a></section>
+  </main>
+
+  <footer id="contacto"><div class="footer-brand"><span class="brand-mark">♥</span><div><strong>La Bienvenida</strong><p>Porque todos merecen llegar a casa.</p></div></div><div><h3>Ven a conocernos</h3><p>Carretera de Porzuna, km 20<br>13196 Ciudad Real</p><small>Visitas con cita previa</small></div><div><h3>Hablemos</h3><a href="mailto:petercanespejos@gmail.com">petercanespejos@gmail.com</a><div class="socials"><a href="#" aria-label="Instagram">ig</a><a href="#" aria-label="Facebook">f</a><a href="#" aria-label="Youtube">yt</a></div></div><div class="footer-bottom"><span>© 2026 Protectora La Bienvenida</span><span>Asociación sin ánimo de lucro</span></div></footer>
+  <script src="script.js"></script>
+</body>
+</html>

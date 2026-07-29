@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Conoce a nuestros animales en adopción en La Bienvenida." />
+  <title>Conoce a nuestros animales · La Bienvenida</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="animal.css" />
+  <link rel="stylesheet" href="profile-hero.css" />
+  <link rel="stylesheet" href="table-health.css" />
+  <link rel="stylesheet" href="story-hero.css" />
+  <link rel="stylesheet" href="photo-size.css" />
+</head>
+<body>
+  <header class="site-header detail-header">
+    <a class="brand" href="index.html" aria-label="Volver al inicio"><span class="brand-mark">♥</span><span><strong>La Bienvenida</strong><small>Protectora de animales</small></span></a>
+    <a class="back-link" href="adopta.html">← Volver a los animales</a>
+  </header>
+
+  <main id="animal-profile">
+    <section class="profile-hero">
+      <div class="profile-image"><img id="animal-image" alt="" /></div>
+      <div class="profile-intro">
+        <div class="profile-main"><span class="eyebrow" id="animal-status"></span><h1 id="animal-name"></h1><p class="lead" id="animal-tagline"></p><div class="personality-tags" id="personality-tags" aria-label="Rasgos de personalidad"></div></div>
+        <article class="hero-story"><span class="section-kicker">Su historia</span><h2 id="story-title"></h2><p id="animal-story"></p></article>
+        <div class="profile-lower"><div class="quick-facts" id="quick-facts"></div><div class="hero-actions-detail"><button class="button" data-action="adoptar">Quiero adoptar</button><button class="sponsor-link" data-action="apadrinar">Apadrinar <span>→</span></button><button class="sponsor-link" data-action="donar">Donar <span>→</span></button></div><p class="availability-note"><span></span> Disponible para iniciar el proceso</p></div>
+      </div>
+    </section>
+
+    <section class="care-section">
+      <div class="care-heading"><span class="section-kicker">Lo importante</span><h2>Todo lo que necesitas saber</h2><p>Queremos que la decisión sea buena para ambos. Esta información es orientativa y se confirma durante el proceso.</p></div>
+      <div class="care-grid" id="care-grid"></div>
+    </section>
+
+    <section class="compatibility">
+      <div><span class="section-kicker">Su hogar ideal</span><h2 id="ideal-title"></h2></div>
+      <div class="compat-list" id="compat-list"></div>
+    </section>
+
+    <section class="next-animal"><p>Hay muchas historias esperando un hogar</p><a href="adopta.html">Conocer a otros animales →</a></section>
+  </main>
+
+  <div class="modal" id="action-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel"><button class="modal-close" data-close aria-label="Cerrar">×</button><span class="eyebrow" id="modal-eyebrow"></span><h2 id="modal-title"></h2><p id="modal-copy"></p><div id="donation-options" class="donation-options" hidden><button>10 €</button><button class="active">20 €</button><button>50 €</button><button>Otra cantidad</button></div><form id="interest-form"><label>Nombre<input required name="nombre" placeholder="Tu nombre"></label><label>Email<input required type="email" name="email" placeholder="tu@email.com"></label><label>Mensaje<textarea name="mensaje" rows="3"></textarea></label><button class="button" type="submit" id="submit-action">Enviar solicitud</button></form></div>
+  </div>
+
+  <footer class="detail-footer"><div class="footer-brand"><span class="brand-mark">♥</span><div><strong>La Bienvenida</strong><p>Porque todos merecen llegar a casa.</p></div></div><a href="mailto:petercanespejos@gmail.com">petercanespejos@gmail.com</a></footer>
+  <script src="animal.js"></script>
+</body>
+</html>
