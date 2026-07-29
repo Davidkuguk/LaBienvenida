@@ -1,0 +1,41 @@
+.access-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 17px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-weight: 700;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.access-link:hover,
+.access-link:focus-visible {
+  background: var(--ink);
+  color: #fff;
+}
+
+.nav > .access-link::after {
+  display: none !important;
+}
+
+.detail-header .access-link {
+  margin-left: auto;
+  margin-right: 24px;
+}
+
+@media (max-width: 850px) {
+  .nav .access-link {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .detail-header .access-link {
+    padding: 8px 11px;
+    margin-right: 12px;
+    font-size: 12px;
+  }
+}

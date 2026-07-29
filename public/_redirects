@@ -1,0 +1,8 @@
+/admin         /index.html                                           200
+/admin/*       /index.html                                           200
+/adopta       /protectora-la-bienvenida-netlify/adopta.html         200
+/nosotros     /protectora-la-bienvenida-netlify/nosotros.html       200
+/como-ayudar  /protectora-la-bienvenida-netlify/ayuda.html          200
+/contacto     /protectora-la-bienvenida-netlify/contacto.html       200
+/animal       /protectora-la-bienvenida-netlify/animal.html         200
+/              /protectora-la-bienvenida-netlify/index.html          200!

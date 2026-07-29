@@ -1,83 +1,124 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Protectora La Bienvenida. Adopta, acoge o colabora con nuestros animales en Ciudad Real." />
-  <title>La Bienvenida · Protectora de Animales</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="hero-mobile.css" />
-  <link rel="stylesheet" href="home.css" />
-</head>
-<body>
-  <header class="site-header" id="inicio">
-    <a class="brand" href="index.html" aria-label="La Bienvenida, inicio">
-      <span class="brand-mark" aria-hidden="true">♥</span>
-      <span><strong>La Bienvenida</strong><small>Protectora de animales</small></span>
-    </a>
-    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰</button>
-    <nav class="nav" aria-label="Navegación principal">
-      <a class="active" href="index.html" aria-current="page">Inicio</a>
-      <a href="adopta.html">Adopta</a>
-      <a href="nosotros.html">Nosotros</a>
-      <a href="ayuda.html">Cómo ayudar</a>
-      <a href="contacto.html">Contacto</a>
-      <a class="button button-small" href="ayuda.html#donar">Donar</a>
-    </nav>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/protectora-la-bienvenida-netlify/" />
+    <meta
+      name="description"
+      content="Protectora La Bienvenida. Adopta, acoge o colabora con nuestros animales en Ciudad Real."
+    />
+    <title>La Bienvenida · Protectora de Animales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="access.css" />
+    <link rel="stylesheet" href="hero-mobile.css" />
+    <link rel="stylesheet" href="home.css" />
+  </head>
+  <body>
+    <header class="site-header" id="inicio">
+      <a class="brand" href="index.html" aria-label="La Bienvenida, inicio">
+        <span class="brand-mark" aria-hidden="true">♥</span>
+        <span><strong>La Bienvenida</strong><small>Protectora de animales</small></span>
+      </a>
+      <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰</button>
+      <nav class="nav" aria-label="Navegación principal">
+        <a class="active" href="/" aria-current="page">Inicio</a>
+        <a href="/adopta">Adopta</a>
+        <a href="/nosotros">Nosotros</a>
+        <a href="/como-ayudar">Cómo ayudar</a>
+        <a href="/contacto">Contacto</a>
+        <a class="access-link" href="/admin">Acceder</a>
+        <a class="button button-small" href="/como-ayudar#donar">Donar</a>
+      </nav>
+    </header>
 
-  <main>
-    <section class="hero">
-      <img src="./assets/hero-refugio.jpg" alt="Un perro y un gato rescatados descansan juntos en la puerta del refugio" fetchpriority="high" />
-      <div class="hero-overlay"></div>
-      <div class="hero-content reveal">
-        <span class="eyebrow">Ciudad Real · Desde 1994</span>
-        <h1>Una segunda oportunidad empieza con un <em>hola.</em></h1>
-        <p>Rescatamos, cuidamos y encontramos familias para animales que solo necesitan volver a confiar.</p>
-        <div class="hero-actions">
-          <a class="button" href="adopta.html">Conoce a tu compañero</a>
-          <a class="text-link" href="ayuda.html">Quiero ayudar <span>→</span></a>
+    <main>
+      <section class="hero">
+        <img
+          src="./assets/hero-refugio.jpg"
+          alt="Un perro y un gato rescatados descansan juntos en la puerta del refugio"
+          fetchpriority="high"
+        />
+        <div class="hero-overlay"></div>
+        <div class="hero-content reveal">
+          <span class="eyebrow">Ciudad Real · Desde 1994</span>
+          <h1>Una segunda oportunidad empieza con un <em>hola.</em></h1>
+          <p>
+            Rescatamos, cuidamos y encontramos familias para animales que solo necesitan volver a
+            confiar.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="/adopta">Conoce a tu compañero</a>
+            <a class="text-link" href="/como-ayudar">Quiero ayudar <span>→</span></a>
+          </div>
+        </div>
+        <div class="hero-note">
+          <strong>280</strong><span>vidas a nuestro cuidado<br />cada día</span>
+        </div>
+      </section>
+
+      <section class="home-sections" aria-labelledby="home-sections-title">
+        <div class="home-sections-heading reveal">
+          <span class="eyebrow">Descubre La Bienvenida</span>
+          <h2 id="home-sections-title">Cada historia tiene su propia puerta.</h2>
+          <p>Elige por dónde quieres empezar.</p>
+        </div>
+        <div class="home-sections-grid">
+          <a class="home-section-card reveal" href="/adopta">
+            <span>01</span>
+            <h3>Adopta</h3>
+            <p>Conoce a los animales que están esperando una familia.</p>
+            <b>Ver animales →</b>
+          </a>
+          <a class="home-section-card reveal" href="/nosotros">
+            <span>02</span>
+            <h3>Nosotros</h3>
+            <p>Descubre quiénes somos y por qué trabajamos por ellos.</p>
+            <b>Conócenos →</b>
+          </a>
+          <a class="home-section-card reveal" href="/como-ayudar">
+            <span>03</span>
+            <h3>Cómo ayudar</h3>
+            <p>Voluntariado, acogida y donaciones que cambian vidas.</p>
+            <b>Quiero colaborar →</b>
+          </a>
+          <a class="home-section-card reveal" href="/contacto">
+            <span>04</span>
+            <h3>Contacto</h3>
+            <p>Escríbenos o concierta una visita al refugio.</p>
+            <b>Hablemos →</b>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-brand">
+        <span class="brand-mark">♥</span>
+        <div>
+          <strong>La Bienvenida</strong>
+          <p>Porque todos merecen llegar a casa.</p>
         </div>
       </div>
-      <div class="hero-note"><strong>280</strong><span>vidas a nuestro cuidado<br>cada día</span></div>
-    </section>
-
-    <section class="home-sections" aria-labelledby="home-sections-title">
-      <div class="home-sections-heading reveal">
-        <span class="eyebrow">Descubre La Bienvenida</span>
-        <h2 id="home-sections-title">Cada historia tiene su propia puerta.</h2>
-        <p>Elige por dónde quieres empezar.</p>
+      <div>
+        <h3>Ven a conocernos</h3>
+        <p>Carretera de Porzuna, km 20<br />13196 Ciudad Real</p>
+        <small>Visitas con cita previa</small>
       </div>
-      <div class="home-sections-grid">
-        <a class="home-section-card reveal" href="adopta.html">
-          <span>01</span><h3>Adopta</h3>
-          <p>Conoce a los animales que están esperando una familia.</p><b>Ver animales →</b>
-        </a>
-        <a class="home-section-card reveal" href="nosotros.html">
-          <span>02</span><h3>Nosotros</h3>
-          <p>Descubre quiénes somos y por qué trabajamos por ellos.</p><b>Conócenos →</b>
-        </a>
-        <a class="home-section-card reveal" href="ayuda.html">
-          <span>03</span><h3>Cómo ayudar</h3>
-          <p>Voluntariado, acogida y donaciones que cambian vidas.</p><b>Quiero colaborar →</b>
-        </a>
-        <a class="home-section-card reveal" href="contacto.html">
-          <span>04</span><h3>Contacto</h3>
-          <p>Escríbenos o concierta una visita al refugio.</p><b>Hablemos →</b>
-        </a>
+      <div>
+        <h3>Hablemos</h3>
+        <a href="mailto:petercanespejos@gmail.com">petercanespejos@gmail.com</a>
       </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="footer-brand"><span class="brand-mark">♥</span><div><strong>La Bienvenida</strong><p>Porque todos merecen llegar a casa.</p></div></div>
-    <div><h3>Ven a conocernos</h3><p>Carretera de Porzuna, km 20<br>13196 Ciudad Real</p><small>Visitas con cita previa</small></div>
-    <div><h3>Hablemos</h3><a href="mailto:petercanespejos@gmail.com">petercanespejos@gmail.com</a></div>
-    <div class="footer-bottom"><span>© 2026 Protectora La Bienvenida</span><span>Asociación sin ánimo de lucro</span></div>
-  </footer>
-  <script src="script.js"></script>
-</body>
+      <div class="footer-bottom">
+        <span>© 2026 Protectora La Bienvenida</span><span>Asociación sin ánimo de lucro</span>
+      </div>
+    </footer>
+    <script src="script.js"></script>
+  </body>
 </html>

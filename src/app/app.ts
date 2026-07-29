@@ -56,6 +56,26 @@ const initialForm: AnimalForm = {
   styleUrl: './app.scss',
 })
 export class App {
+  constructor() {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const publicPages: Record<string, string> = {
+      '/': '/protectora-la-bienvenida-netlify/index.html',
+      '/adopta': '/protectora-la-bienvenida-netlify/adopta.html',
+      '/nosotros': '/protectora-la-bienvenida-netlify/nosotros.html',
+      '/como-ayudar': '/protectora-la-bienvenida-netlify/ayuda.html',
+      '/contacto': '/protectora-la-bienvenida-netlify/contacto.html',
+      '/animal': '/protectora-la-bienvenida-netlify/animal.html',
+    };
+    const publicPage = publicPages[window.location.pathname.replace(/\/+$/, '') || '/'];
+
+    if (publicPage) {
+      window.location.replace(`${publicPage}${window.location.search}${window.location.hash}`);
+    }
+  }
+
   protected readonly animals = signal<ShelterAnimal[]>([
     {
       id: 1,

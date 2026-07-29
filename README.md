@@ -7,11 +7,15 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 El sitio estático de `protectora-la-bienvenida-netlify` forma parte de este proyecto en
 `public/protectora-la-bienvenida-netlify`. Angular lo copia íntegramente al compilar.
 
-Con el servidor de desarrollo iniciado, está disponible en:
+Con el servidor de desarrollo iniciado, la portada está disponible en:
 
 ```text
-http://localhost:4200/protectora-la-bienvenida-netlify/index.html
+http://localhost:4200/
 ```
+
+Las rutas públicas son `/`, `/adopta`, `/nosotros`, `/como-ayudar`, `/contacto` y
+`/animal?id=nombre`. El dashboard administrativo está disponible, por ahora sin autenticación,
+en `/admin`.
 
 El panel principal también incluye el enlace **Ver sitio público** en su navegación lateral.
 
