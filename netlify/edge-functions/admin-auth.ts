@@ -143,7 +143,7 @@ function loginPage(error = '', status = 200): Response {
 }
 
 export default async (request: Request, context: Context): Promise<Response | void> => {
-  const password = Netlify.env.get('ADMIN_PASSWORD');
+  const password = Netlify.env.get('ADMIN_PASSWORD')?.trim().normalize('NFC');
 
   if (!password) {
     return loginPage('El acceso todavía no está configurado en Netlify.', 503);
@@ -152,7 +152,7 @@ export default async (request: Request, context: Context): Promise<Response | vo
   const url = new URL(request.url);
 
   if (url.pathname === '/admin/logout') {
-    context.cookies.delete({ name: cookieName, path: '/admin' });
+    context.cookies.delete({ name: cookieName, path: '/' });
     return Response.redirect(new URL('/admin', request.url), 303);
   }
 
@@ -163,14 +163,14 @@ export default async (request: Request, context: Context): Promise<Response | vo
 
   if (request.method === 'POST') {
     const form = await request.formData();
-    const submittedPassword = String(form.get('password') ?? '');
+    const submittedPassword = String(form.get('password') ?? '').trim().normalize('NFC');
 
     if (secureEqual(submittedPassword, password)) {
       const session = await createSession(password);
       context.cookies.set({
         name: cookieName,
         value: session.token,
-        path: '/admin',
+        path: '/',
         expires: session.expires,
         httpOnly: true,
         secure: true,

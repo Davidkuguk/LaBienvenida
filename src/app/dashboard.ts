@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 type AnimalStatus = 'available' | 'reserved' | 'adopted' | 'medical';
 
 interface ShelterAnimal {
-  id: number;
+  id: string;
   name: string;
   photos: string[];
   species: string;
@@ -80,7 +80,8 @@ const initialForm: AnimalForm = {
   styleUrl: './dashboard.scss',
 })
 export class Dashboard implements OnInit {
-  protected readonly animals = signal<ShelterAnimal[]>([
+  /*
+  protected readonly legacyAnimals = signal<ShelterAnimal[]>([
     {
       id: 1,
       name: 'Luna',
@@ -151,9 +152,14 @@ export class Dashboard implements OnInit {
       compatibleCats: 'Por valorar',
     },
   ]);
+  */
+  protected readonly animals = signal<ShelterAnimal[]>([]);
 
   protected readonly form = signal<AnimalForm>({ ...initialForm });
-  protected readonly editingId = signal<number | null>(null);
+  protected readonly editingId = signal<string | null>(null);
+  protected readonly animalsLoading = signal(true);
+  protected readonly saveError = signal('');
+  protected readonly saving = signal(false);
   protected readonly statusFilter = signal<AnimalStatus | 'all'>('all');
   protected readonly searchTerm = signal('');
   protected readonly sidebarCollapsed = signal(false);
@@ -190,6 +196,24 @@ export class Dashboard implements OnInit {
 
   ngOnInit(): void {
     this.loadVisitorCount();
+    void this.loadAnimals();
+  }
+
+  private async loadAnimals(): Promise<void> {
+    try {
+      const response = await fetch('/.netlify/functions/animals', {
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+      });
+      if (!response.ok) throw new Error('No se pudo cargar');
+      const data = (await response.json()) as { animals?: ShelterAnimal[] };
+      if (!Array.isArray(data.animals)) throw new Error('Respuesta no válida');
+      this.animals.set(data.animals);
+    } catch {
+      this.saveError.set('No se pudieron cargar los animales. Vuelve a intentarlo.');
+    } finally {
+      this.animalsLoading.set(false);
+    }
   }
 
   protected visitorCountLabel(): string {
@@ -228,7 +252,7 @@ export class Dashboard implements OnInit {
     this.sidebarCollapsed.update((collapsed) => !collapsed);
   }
 
-  protected saveAnimal(): void {
+  protected async saveAnimal(): Promise<void> {
     const form = this.form();
 
     if (!form.name.trim() || !form.breed.trim() || !form.description.trim() || form.age === null) {
@@ -236,7 +260,7 @@ export class Dashboard implements OnInit {
     }
 
     const animal: ShelterAnimal = {
-      id: this.editingId() ?? Date.now(),
+      id: this.editingId() ?? this.createId(form.name),
       name: form.name.trim(),
       photos: form.photos,
       species: form.species.trim(),
@@ -259,15 +283,28 @@ export class Dashboard implements OnInit {
       compatibleCats: form.compatibleCats.trim(),
     };
 
-    if (this.editingId()) {
-      this.animals.update((animals) =>
-        animals.map((currentAnimal) => (currentAnimal.id === animal.id ? animal : currentAnimal)),
-      );
-    } else {
-      this.animals.update((animals) => [animal, ...animals]);
+    this.saving.set(true);
+    this.saveError.set('');
+    try {
+      const response = await fetch('/.netlify/functions/animals', {
+        method: this.editingId() ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(animal),
+      });
+      const data = (await response.json().catch(() => null)) as
+        | { animals?: ShelterAnimal[]; error?: string }
+        | null;
+      if (!response.ok || !Array.isArray(data?.animals)) {
+        throw new Error(data?.error || 'No se pudo guardar');
+      }
+      this.animals.set(data.animals);
+      this.resetForm();
+    } catch (error) {
+      this.saveError.set(error instanceof Error ? error.message : 'No se pudo guardar el animal.');
+    } finally {
+      this.saving.set(false);
     }
-
-    this.resetForm();
   }
 
   protected editAnimal(animal: ShelterAnimal): void {
@@ -296,12 +333,36 @@ export class Dashboard implements OnInit {
     });
   }
 
-  protected removeAnimal(id: number): void {
-    this.animals.update((animals) => animals.filter((animal) => animal.id !== id));
-
-    if (this.editingId() === id) {
-      this.resetForm();
+  protected async removeAnimal(id: string): Promise<void> {
+    if (!confirm('¿Seguro que quieres eliminar este animal de la web?')) return;
+    this.saveError.set('');
+    try {
+      const response = await fetch(`/.netlify/functions/animals?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+      });
+      const data = (await response.json().catch(() => null)) as
+        | { animals?: ShelterAnimal[]; error?: string }
+        | null;
+      if (!response.ok || !Array.isArray(data?.animals)) {
+        throw new Error(data?.error || 'No se pudo eliminar');
+      }
+      this.animals.set(data.animals);
+      if (this.editingId() === id) this.resetForm();
+    } catch (error) {
+      this.saveError.set(error instanceof Error ? error.message : 'No se pudo eliminar el animal.');
     }
+  }
+
+  private createId(name: string): string {
+    const slug = name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    return this.animals().some((animal) => animal.id === slug) ? `${slug}-${Date.now()}` : slug;
   }
 
   protected resetForm(): void {

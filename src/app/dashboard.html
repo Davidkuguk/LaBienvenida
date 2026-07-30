@@ -105,6 +105,9 @@
         </div>
 
         <form (ngSubmit)="saveAnimal()" #animalForm="ngForm">
+          @if (saveError()) {
+            <p class="form-error" role="alert">{{ saveError() }}</p>
+          }
           <div class="form-section-title">
             <span>01</span>
             <div><strong>Datos principales</strong><small>Información visible en la tabla de la ficha</small></div>
@@ -342,8 +345,8 @@
             }
           </div>
 
-          <button class="submit-button" type="submit" [disabled]="animalForm.invalid">
-            {{ editingId() ? 'Guardar cambios' : 'Registrar animal' }}
+          <button class="submit-button" type="submit" [disabled]="animalForm.invalid || saving()">
+            {{ saving() ? 'Guardando…' : editingId() ? 'Guardar cambios' : 'Registrar animal' }}
           </button>
         </form>
       </section>
