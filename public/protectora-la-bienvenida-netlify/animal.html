@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="access.css" />
     <link rel="stylesheet" href="animal.css" />
     <link rel="stylesheet" href="profile-hero.css" />
+    <link rel="stylesheet" href="profile-facts.css" />
+    <link rel="stylesheet" href="profile-compatibility.css" />
     <link rel="stylesheet" href="table-health.css" />
     <link rel="stylesheet" href="story-hero.css" />
     <link rel="stylesheet" href="photo-size.css" />
@@ -36,20 +38,21 @@
           <div class="profile-main">
             <span class="eyebrow" id="animal-status"></span>
             <h1 id="animal-name"></h1>
-            <p class="lead" id="animal-tagline"></p>
-            <div
-              class="personality-tags"
-              id="personality-tags"
-              aria-label="Rasgos de personalidad"
-            ></div>
+            <div class="quick-facts" id="quick-facts"></div>
           </div>
           <article class="hero-story">
             <span class="section-kicker">Su historia</span>
             <h2 id="story-title"></h2>
             <p id="animal-story"></p>
           </article>
+          <section class="compatibility profile-compatibility" aria-labelledby="ideal-title">
+            <div class="ideal-summary">
+              <span class="section-kicker">Su hogar ideal</span>
+              <h2 id="ideal-title"></h2>
+            </div>
+            <div class="compat-list" id="compat-list"></div>
+          </section>
           <div class="profile-lower">
-            <div class="quick-facts" id="quick-facts"></div>
             <div class="hero-actions-detail">
               <button class="button" data-action="adoptar">Quiero adoptar</button
               ><button class="sponsor-link" data-action="apadrinar">Apadrinar <span>→</span></button
@@ -70,14 +73,6 @@
           </p>
         </div>
         <div class="care-grid" id="care-grid"></div>
-      </section>
-
-      <section class="compatibility">
-        <div>
-          <span class="section-kicker">Su hogar ideal</span>
-          <h2 id="ideal-title"></h2>
-        </div>
-        <div class="compat-list" id="compat-list"></div>
       </section>
 
       <section class="next-animal">

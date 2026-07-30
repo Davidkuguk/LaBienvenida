@@ -1,0 +1,76 @@
+.profile-intro .profile-compatibility {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.8fr) minmax(260px, 1.2fr);
+  gap: 28px;
+  padding: 22px 24px;
+  background: rgba(202, 214, 189, 0.28);
+  border-left: 3px solid var(--orange);
+}
+
+.profile-compatibility .ideal-summary {
+  align-self: center;
+}
+
+.profile-compatibility .ideal-summary h2 {
+  margin: 8px 0 0;
+  font: 600 clamp(20px, 2vw, 28px) / 1.15 var(--serif);
+  letter-spacing: -0.4px;
+}
+
+.profile-compatibility .compat-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 0;
+  gap: 8px;
+}
+
+.profile-compatibility .compat-row {
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  min-height: 68px;
+  padding: 9px 12px;
+  border: 1px solid rgba(22, 51, 45, 0.12);
+  background: rgba(255, 253, 248, 0.72);
+}
+
+.profile-compatibility .compat-row span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #65756e;
+}
+
+.profile-compatibility .compat-row b {
+  padding: 0;
+  background: transparent;
+  color: var(--green);
+  font-size: 12px;
+}
+
+.profile-compatibility .compat-row b.maybe {
+  background: transparent;
+  color: #9b542d;
+}
+
+.profile-compatibility + .profile-lower {
+  margin-top: auto;
+}
+
+@media (max-width: 1100px) {
+  .profile-intro .profile-compatibility {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .profile-intro .profile-compatibility {
+    padding: 20px;
+  }
+
+  .profile-compatibility .compat-list {
+    grid-template-columns: 1fr;
+  }
+}

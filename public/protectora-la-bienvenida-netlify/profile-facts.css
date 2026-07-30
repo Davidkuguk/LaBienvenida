@@ -1,0 +1,27 @@
+.profile-main .quick-facts {
+  margin: 26px 0;
+}
+
+.profile-main + .hero-story {
+  border-top: 0;
+}
+
+.quick-facts .exercise-fact {
+  grid-column: 1 / -1;
+  border-right: 0;
+  padding-left: 0;
+}
+
+.exercise-fact strong::before {
+  content: '●';
+  margin-right: 8px;
+  color: var(--orange);
+  font-size: 9px;
+  vertical-align: 2px;
+}
+
+@media (max-width: 850px) {
+  .profile-main .quick-facts {
+    margin-top: 30px;
+  }
+}

@@ -12,11 +12,19 @@ interface ShelterAnimal {
   age: number;
   sex: 'Hembra' | 'Macho';
   size: 'Pequeno' | 'Mediano' | 'Grande';
+  weight: string;
   status: AnimalStatus;
   arrivalDate: string;
-  location: string;
   description: string;
   notes: string;
+  exercise: string;
+  idealHome: string;
+  medicalStatus: string;
+  medicalDetail: string;
+  compatibleAdults: string;
+  compatibleChildren: string;
+  compatibleDogs: string;
+  compatibleCats: string;
 }
 
 interface AnimalForm {
@@ -27,11 +35,19 @@ interface AnimalForm {
   age: number | null;
   sex: ShelterAnimal['sex'];
   size: ShelterAnimal['size'];
+  weight: string;
   status: AnimalStatus;
   arrivalDate: string;
-  location: string;
   description: string;
   notes: string;
+  exercise: string;
+  idealHome: string;
+  medicalStatus: string;
+  medicalDetail: string;
+  compatibleAdults: string;
+  compatibleChildren: string;
+  compatibleDogs: string;
+  compatibleCats: string;
 }
 
 const initialForm: AnimalForm = {
@@ -42,11 +58,19 @@ const initialForm: AnimalForm = {
   age: null,
   sex: 'Hembra',
   size: 'Mediano',
+  weight: '',
   status: 'available',
   arrivalDate: new Date().toISOString().slice(0, 10),
-  location: 'Refugio principal',
   description: '',
   notes: '',
+  exercise: '',
+  idealHome: '',
+  medicalStatus: 'Sin enfermedades diagnosticadas',
+  medicalDetail: '',
+  compatibleAdults: 'Sí',
+  compatibleChildren: 'Por valorar',
+  compatibleDogs: 'Por valorar',
+  compatibleCats: 'Por valorar',
 };
 
 @Component({
@@ -86,11 +110,19 @@ export class App {
       age: 3,
       sex: 'Hembra',
       size: 'Mediano',
+      weight: '18 kg',
       status: 'available',
       arrivalDate: '2026-04-12',
-      location: 'Casa de acogida',
       description: 'Carinosa, tranquila y sociable con otros perros.',
       notes: 'Vacunada y esterilizada.',
+      exercise: 'Moderado · 60 minutos al día',
+      idealHome: 'Un hogar tranquilo con rutinas estables.',
+      medicalStatus: 'Sin enfermedades diagnosticadas',
+      medicalDetail: 'Vacunada, chipada y esterilizada.',
+      compatibleAdults: 'Sí',
+      compatibleChildren: 'Mayores de 8',
+      compatibleDogs: 'Sí',
+      compatibleCats: 'Por valorar',
     },
     {
       id: 2,
@@ -101,11 +133,19 @@ export class App {
       age: 1,
       sex: 'Macho',
       size: 'Pequeno',
+      weight: '5 kg',
       status: 'reserved',
       arrivalDate: '2026-05-03',
-      location: 'Gatera 2',
       description: 'Jugueton, curioso y muy cercano con personas.',
       notes: 'Pendiente de visita preadopcion.',
+      exercise: 'Moderado · 45 minutos de juego al día',
+      idealHome: 'Una casa estimulante donde forme parte de la familia.',
+      medicalStatus: 'Sin enfermedades diagnosticadas',
+      medicalDetail: 'Vacunado y esterilizado.',
+      compatibleAdults: 'Sí',
+      compatibleChildren: 'Sí',
+      compatibleDogs: 'Con adaptación',
+      compatibleCats: 'Sí',
     },
     {
       id: 3,
@@ -116,11 +156,19 @@ export class App {
       age: 5,
       sex: 'Hembra',
       size: 'Grande',
+      weight: '24 kg',
       status: 'medical',
       arrivalDate: '2026-03-20',
-      location: 'Veterinario',
       description: 'Dulce y algo timida al principio.',
       notes: 'Tratamiento de piel en seguimiento.',
+      exercise: 'Bajo-moderado · 45 minutos al día',
+      idealHome: 'Una familia paciente que respete su adaptación.',
+      medicalStatus: 'Tratamiento dermatológico',
+      medicalDetail: 'Revisión veterinaria y tratamiento en seguimiento.',
+      compatibleAdults: 'Sí',
+      compatibleChildren: 'Mayores de 12',
+      compatibleDogs: 'Presentación previa',
+      compatibleCats: 'Por valorar',
     },
   ]);
 
@@ -138,7 +186,7 @@ export class App {
       const matchesStatus = status === 'all' || animal.status === status;
       const matchesSearch =
         !search ||
-        [animal.name, animal.species, animal.breed, animal.location]
+        [animal.name, animal.species, animal.breed, animal.exercise, animal.idealHome]
           .join(' ')
           .toLowerCase()
           .includes(search);
@@ -181,11 +229,19 @@ export class App {
       age: form.age,
       sex: form.sex,
       size: form.size,
+      weight: form.weight.trim(),
       status: form.status,
       arrivalDate: form.arrivalDate,
-      location: form.location.trim(),
       description: form.description.trim(),
       notes: form.notes.trim(),
+      exercise: form.exercise.trim(),
+      idealHome: form.idealHome.trim(),
+      medicalStatus: form.medicalStatus.trim(),
+      medicalDetail: form.medicalDetail.trim(),
+      compatibleAdults: form.compatibleAdults.trim(),
+      compatibleChildren: form.compatibleChildren.trim(),
+      compatibleDogs: form.compatibleDogs.trim(),
+      compatibleCats: form.compatibleCats.trim(),
     };
 
     if (this.editingId()) {
@@ -209,11 +265,19 @@ export class App {
       age: animal.age,
       sex: animal.sex,
       size: animal.size,
+      weight: animal.weight,
       status: animal.status,
       arrivalDate: animal.arrivalDate,
-      location: animal.location,
       description: animal.description,
       notes: animal.notes,
+      exercise: animal.exercise,
+      idealHome: animal.idealHome,
+      medicalStatus: animal.medicalStatus,
+      medicalDetail: animal.medicalDetail,
+      compatibleAdults: animal.compatibleAdults,
+      compatibleChildren: animal.compatibleChildren,
+      compatibleDogs: animal.compatibleDogs,
+      compatibleCats: animal.compatibleCats,
     });
   }
 

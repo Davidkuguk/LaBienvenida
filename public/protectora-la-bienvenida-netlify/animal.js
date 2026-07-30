@@ -318,6 +318,18 @@ const medicalRecords = {
   },
 };
 
+const exerciseNeeds = {
+  milo: 'Moderado · 60 minutos al día',
+  luna: 'Bajo-moderado · 30 minutos de juego al día',
+  bruno: 'Bajo · 30–40 minutos al día',
+  nala: 'Moderado · 45 minutos de juego al día',
+  roco: 'Alto · 90 minutos al día',
+  simba: 'Moderado · 45 minutos de juego al día',
+  kira: 'Alto · 90–120 minutos al día',
+  coco: 'Bajo · 20–30 minutos de juego al día',
+  duna: 'Medio-alto · 75–90 minutos al día',
+};
+
 const id = new URLSearchParams(location.search).get('id')?.toLowerCase() || 'milo';
 const animal = animals[id] || animals.milo;
 const medical = medicalRecords[id] || medicalRecords.milo;
@@ -326,18 +338,15 @@ document.querySelector('#animal-image').src = animal.image;
 document.querySelector('#animal-image').alt = `${animal.name}, animal en adopción`;
 document.querySelector('#animal-status').textContent = animal.status;
 document.querySelector('#animal-name').textContent = animal.name;
-document.querySelector('#animal-tagline').textContent = animal.tagline;
+const facts = [...animal.facts, ['Ejercicio', exerciseNeeds[id] || exerciseNeeds.milo]];
 document.querySelector('#quick-facts').innerHTML =
-  animal.facts
+  facts
     .map(
-      ([label, value]) => `<div class="fact"><span>${label}</span><strong>${value}</strong></div>`,
+      ([label, value]) =>
+        `<div class="fact ${label === 'Ejercicio' ? 'exercise-fact' : ''}"><span>${label}</span><strong>${value}</strong></div>`,
     )
     .join('') +
   `<div class="fact medical-fact ${medical.condition ? 'has-condition' : ''}"><div><span>Estado veterinario</span><strong>${medical.title}</strong><small>${medical.detail}</small></div><b>${medical.condition ? 'Requiere seguimiento' : 'Sin patologías'}</b></div>`;
-document.querySelector('#personality-tags').innerHTML = animal.care[0][2]
-  .split(',')
-  .map((trait) => `<span>${trait.trim()}</span>`)
-  .join('');
 document.querySelector('#story-title').textContent = `Conoce a ${animal.name}`;
 document.querySelector('#animal-story').textContent = animal.story;
 document.querySelector('#care-grid').innerHTML = animal.care
