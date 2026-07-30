@@ -115,6 +115,18 @@ nav {
     color: var(--ink);
     background: var(--cream);
   }
+
+  .logout-link {
+    margin-top: 14px;
+    border: 1px solid rgba(255, 253, 248, 0.28);
+    color: #ffd9ca;
+  }
+
+  .logout-link:hover {
+    color: #fff;
+    background: var(--orange);
+    border-color: var(--orange);
+  }
 }
 
 .workspace {

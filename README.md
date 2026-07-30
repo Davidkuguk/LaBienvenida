@@ -19,6 +19,29 @@ en `/admin`.
 
 El panel principal también incluye el enlace **Ver sitio público** en su navegación lateral.
 
+## Acceso de administración
+
+La ruta `/admin` está protegida en Netlify mediante una Edge Function y una contraseña
+compartida. Las dos personas administradoras usan la misma contraseña, pero cada navegador
+recibe su propia sesión de 24 horas.
+
+Antes de desplegar, crea esta variable en **Netlify → Project configuration →
+Environment variables** y márcala como secreta:
+
+```text
+ADMIN_PASSWORD=una-contraseña-larga-y-segura
+```
+
+La variable debe estar disponible para el ámbito **Functions**. Después de crearla,
+realiza un nuevo despliegue. Cambiar `ADMIN_PASSWORD` modifica la clave compartida e
+invalida automáticamente todas las sesiones abiertas.
+
+El botón **Cerrar sesión** elimina únicamente la sesión del navegador actual.
+
+La protección se ejecuta en la infraestructura de Netlify. Para probarla localmente debe
+usarse Netlify Dev; `ng serve` sirve únicamente la aplicación Angular y no ejecuta Edge
+Functions.
+
 ## Development server
 
 To start a local development server, run:
