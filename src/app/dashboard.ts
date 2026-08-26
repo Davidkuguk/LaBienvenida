@@ -2,6 +2,9 @@ import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 type AnimalStatus = 'available' | 'reserved' | 'adopted' | 'medical';
+type RequestStatus = 'new' | 'contacted' | 'visit' | 'approved' | 'closed';
+
+interface AdoptionRequest { id: string; animalId: string; animalName: string; name: string; email: string; phone: string; message: string; status: RequestStatus; createdAt: string; }
 
 interface ShelterAnimal {
   id: string;
@@ -80,6 +83,7 @@ const initialForm: AnimalForm = {
   styleUrl: './dashboard.scss',
 })
 export class Dashboard implements OnInit {
+  protected readonly activeSection = signal<'new' | 'inventory' | 'requests'>('new');
   /*
   protected readonly legacyAnimals = signal<ShelterAnimal[]>([
     {
@@ -166,6 +170,8 @@ export class Dashboard implements OnInit {
   protected readonly visitorCount = signal<number | null>(null);
   protected readonly visitorCountLoading = signal(true);
   protected readonly visitorCountUnavailable = signal(false);
+  protected readonly requests = signal<AdoptionRequest[]>([]);
+  protected readonly requestsLoading = signal(true);
 
   protected readonly filteredAnimals = computed(() => {
     const status = this.statusFilter();
@@ -197,6 +203,27 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
     this.loadVisitorCount();
     void this.loadAnimals();
+    void this.loadRequests();
+  }
+
+  private async loadRequests(): Promise<void> {
+    try {
+      const response = await fetch('/.netlify/functions/requests', { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+      const data = (await response.json()) as { requests?: AdoptionRequest[] };
+      if (response.ok && Array.isArray(data.requests)) this.requests.set(data.requests);
+    } catch {
+      // Las solicitudes solo están disponibles cuando se ejecuta mediante Netlify.
+    } finally { this.requestsLoading.set(false); }
+  }
+
+  protected async updateRequestStatus(request: AdoptionRequest, status: RequestStatus): Promise<void> {
+    const response = await fetch('/.netlify/functions/requests', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ id: request.id, status }) });
+    const data = (await response.json().catch(() => null)) as { requests?: AdoptionRequest[] } | null;
+    if (response.ok && Array.isArray(data?.requests)) this.requests.set(data.requests);
+  }
+
+  protected requestStatusLabel(status: RequestStatus): string {
+    return { new: 'Nueva', contacted: 'Contactada', visit: 'Visita', approved: 'Aprobada', closed: 'Cerrada' }[status];
   }
 
   private async loadAnimals(): Promise<void> {
@@ -250,6 +277,10 @@ export class Dashboard implements OnInit {
 
   protected toggleSidebar(): void {
     this.sidebarCollapsed.update((collapsed) => !collapsed);
+  }
+
+  protected showSection(section: 'new' | 'inventory' | 'requests'): void {
+    this.activeSection.set(section);
   }
 
   protected async saveAnimal(): Promise<void> {

@@ -103,7 +103,10 @@
           <label>Nombre<input required name="nombre" placeholder="Tu nombre" /></label
           ><label
             >Email<input required type="email" name="email" placeholder="tu@email.com" /></label
-          ><label>Mensaje<textarea name="mensaje" rows="3"></textarea></label
+          ><label>Teléfono<input required type="tel" name="telefono" placeholder="Tu teléfono" /></label
+          ><label>Mensaje<textarea required name="mensaje" rows="3" placeholder="Cuéntanos por qué te interesa adoptar"></textarea></label
+          ><label class="consent"><input required type="checkbox" name="consentimiento" /> Acepto que La Bienvenida use estos datos para gestionar mi solicitud.</label
+          ><p id="form-status" role="status" aria-live="polite"></p>
           ><button class="button" type="submit" id="submit-action">Enviar solicitud</button>
         </form>
       </div>

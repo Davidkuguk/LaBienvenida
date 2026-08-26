@@ -36,8 +36,9 @@
     </button>
 
     <nav>
-      <a class="active" href="#animals">Animales</a>
-      <a href="#requests">Solicitudes</a>
+      <button type="button" [class.active]="activeSection() === 'new'" (click)="showSection('new')">Nueva ficha</button>
+      <button type="button" [class.active]="activeSection() === 'inventory'" (click)="showSection('inventory')">Inventario</button>
+      <button type="button" [class.active]="activeSection() === 'requests'" (click)="showSection('requests')">Solicitudes</button>
       <a href="#fosters">Acogidas</a>
       <a href="#settings">Ajustes</a>
       <a href="/" target="_blank" rel="noopener">
@@ -55,7 +56,6 @@
         <h1>Dashboard de animales</h1>
         <p class="subtitle">Alta, seguimiento y estado de adopcion de los animales de la protectora.</p>
       </div>
-      <button class="primary-action" type="button" (click)="resetForm()">Nuevo animal</button>
     </header>
 
     <section class="metrics" aria-label="Resumen de animales">
@@ -93,7 +93,7 @@
     </section>
 
     <div class="content-grid">
-      <section class="panel form-panel" aria-labelledby="animal-form-title">
+      <section class="panel form-panel" [hidden]="activeSection() !== 'new'" aria-labelledby="animal-form-title">
         <div class="panel-heading">
           <div>
             <p class="eyebrow">{{ editingId() ? 'Editar ficha' : 'Nueva ficha' }}</p>
@@ -110,7 +110,7 @@
           }
           <div class="form-section-title">
             <span>01</span>
-            <div><strong>Datos principales</strong><small>Información visible en la tabla de la ficha</small></div>
+            <div><strong>Datos principales y hogar ideal</strong><small>Información esencial para registrar y presentar al animal</small></div>
           </div>
 
           <label>
@@ -207,6 +207,52 @@
             />
           </label>
 
+          <label>
+            Su hogar ideal
+            <textarea
+              name="idealHome"
+              rows="3"
+              [ngModel]="form().idealHome"
+              (ngModelChange)="updateForm('idealHome', $event)"
+              placeholder="Ej. Un hogar tranquilo con rutinas estables..."
+            ></textarea>
+          </label>
+
+          <div class="field-row compatibility-fields">
+            <label>
+              Con adultos
+              <input
+                name="compatibleAdults"
+                [ngModel]="form().compatibleAdults"
+                (ngModelChange)="updateForm('compatibleAdults', $event)"
+              />
+            </label>
+            <label>
+              Con niños
+              <input
+                name="compatibleChildren"
+                [ngModel]="form().compatibleChildren"
+                (ngModelChange)="updateForm('compatibleChildren', $event)"
+              />
+            </label>
+            <label>
+              Con perros
+              <input
+                name="compatibleDogs"
+                [ngModel]="form().compatibleDogs"
+                (ngModelChange)="updateForm('compatibleDogs', $event)"
+              />
+            </label>
+            <label>
+              Con gatos
+              <input
+                name="compatibleCats"
+                [ngModel]="form().compatibleCats"
+                (ngModelChange)="updateForm('compatibleCats', $event)"
+              />
+            </label>
+          </div>
+
           <div class="form-section-title">
             <span>02</span>
             <div><strong>Historia y presentación</strong><small>Contenido principal de la página pública</small></div>
@@ -274,57 +320,6 @@
 
           <div class="form-section-title">
             <span>04</span>
-            <div><strong>Hogar ideal y compatibilidad</strong><small>Encaje recomendado para la adopción</small></div>
-          </div>
-
-          <label>
-            Su hogar ideal
-            <textarea
-              name="idealHome"
-              rows="3"
-              [ngModel]="form().idealHome"
-              (ngModelChange)="updateForm('idealHome', $event)"
-              placeholder="Ej. Un hogar tranquilo con rutinas estables..."
-            ></textarea>
-          </label>
-
-          <div class="field-row compatibility-fields">
-            <label>
-              Con adultos
-              <input
-                name="compatibleAdults"
-                [ngModel]="form().compatibleAdults"
-                (ngModelChange)="updateForm('compatibleAdults', $event)"
-              />
-            </label>
-            <label>
-              Con niños
-              <input
-                name="compatibleChildren"
-                [ngModel]="form().compatibleChildren"
-                (ngModelChange)="updateForm('compatibleChildren', $event)"
-              />
-            </label>
-            <label>
-              Con perros
-              <input
-                name="compatibleDogs"
-                [ngModel]="form().compatibleDogs"
-                (ngModelChange)="updateForm('compatibleDogs', $event)"
-              />
-            </label>
-            <label>
-              Con gatos
-              <input
-                name="compatibleCats"
-                [ngModel]="form().compatibleCats"
-                (ngModelChange)="updateForm('compatibleCats', $event)"
-              />
-            </label>
-          </div>
-
-          <div class="form-section-title">
-            <span>05</span>
             <div><strong>Fotografías</strong><small>Galería pública del animal</small></div>
           </div>
 
@@ -351,11 +346,35 @@
         </form>
       </section>
 
-      <section class="panel list-panel" id="animals" aria-labelledby="animal-list-title">
+      <section class="panel requests-panel" [hidden]="activeSection() !== 'requests'" id="requests" aria-labelledby="requests-title">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Adopciones</p><h2 id="requests-title">Solicitudes recibidas</h2></div>
+        </div>
+        @if (requestsLoading()) {
+          <p class="requests-empty">Cargando solicitudes…</p>
+        } @else if (!requests().length) {
+          <p class="requests-empty">Aún no hay solicitudes de adopción.</p>
+        } @else {
+          <div class="request-list">
+            @for (request of requests(); track request.id) {
+              <article class="request-card">
+                <div><strong>{{ request.name }}</strong><span>{{ request.animalName }} · {{ requestStatusLabel(request.status) }}</span></div>
+                <p>{{ request.message }}</p>
+                <a [href]="'mailto:' + request.email">{{ request.email }}</a><a [href]="'tel:' + request.phone">{{ request.phone }}</a>
+                <select [ngModel]="request.status" (ngModelChange)="updateRequestStatus(request, $event)" aria-label="Estado de la solicitud">
+                  <option value="new">Nueva</option><option value="contacted">Contactada</option><option value="visit">Visita</option><option value="approved">Aprobada</option><option value="closed">Cerrada</option>
+                </select>
+              </article>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="panel list-panel" [hidden]="activeSection() !== 'inventory'" id="inventory" aria-labelledby="animal-list-title">
         <div class="panel-heading list-heading">
           <div>
             <p class="eyebrow">Inventario</p>
-            <h2 id="animal-list-title">Animales registrados</h2>
+            <h2 id="animal-list-title">Inventario de animales</h2>
           </div>
           <div class="filters">
             <input

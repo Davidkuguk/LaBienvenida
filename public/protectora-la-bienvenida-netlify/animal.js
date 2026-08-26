@@ -72,12 +72,17 @@
   }
   function setupActions(animal) {
     const modal = document.querySelector('#action-modal');
+    let currentAction = 'adoptar';
     document.querySelectorAll('[data-action]').forEach((button) => button.addEventListener('click', () => {
       const action = button.dataset.action;
+      currentAction = action;
       document.querySelector('#modal-eyebrow').textContent = 'Contacta con nosotros';
       document.querySelector('#modal-title').textContent = `${action[0].toUpperCase() + action.slice(1)} a ${animal.name}`;
       document.querySelector('#modal-copy').textContent = 'Déjanos tus datos y nos pondremos en contacto contigo.';
       document.querySelector('[name="mensaje"]').value = `Hola, me interesa ${action} a ${animal.name}.`;
+      document.querySelector('[name="telefono"]').closest('label').hidden = action !== 'adoptar';
+      document.querySelector('[name="consentimiento"]').closest('label').hidden = action !== 'adoptar';
+      document.querySelector('#form-status').textContent = '';
       document.querySelector('#donation-options').hidden = action !== 'donar';
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
@@ -86,10 +91,25 @@
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
     }));
-    document.querySelector('#interest-form').addEventListener('submit', (event) => {
+    document.querySelector('#interest-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       const form = new FormData(event.currentTarget);
-      location.href = `mailto:petercanespejos@gmail.com?subject=${encodeURIComponent(`Interés en ${animal.name}`)}&body=${encodeURIComponent(`Nombre: ${form.get('nombre')}\nEmail: ${form.get('email')}\n\n${form.get('mensaje')}`)}`;
+      const status = document.querySelector('#form-status');
+      if (currentAction !== 'adoptar') {
+        location.href = `mailto:petercanespejos@gmail.com?subject=${encodeURIComponent(`Interés en ${animal.name}`)}&body=${encodeURIComponent(`Nombre: ${form.get('nombre')}\nEmail: ${form.get('email')}\n\n${form.get('mensaje')}`)}`;
+        return;
+      }
+      const submit = document.querySelector('#submit-action');
+      submit.disabled = true;
+      status.textContent = 'Enviando solicitud…';
+      try {
+        const response = await fetch('/.netlify/functions/requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ animalId: animal.id, animalName: animal.name, name: form.get('nombre'), email: form.get('email'), phone: form.get('telefono'), message: form.get('mensaje') }) });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'No se pudo enviar la solicitud.');
+        event.currentTarget.reset();
+        status.textContent = 'Solicitud enviada. Nos pondremos en contacto contigo pronto.';
+      } catch (error) { status.textContent = error.message || 'No se pudo enviar la solicitud.'; }
+      finally { submit.disabled = false; }
     });
   }
 })();
