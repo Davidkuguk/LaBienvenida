@@ -33,7 +33,7 @@
       ['Sexo', animal.sex],
       ['Tamaño', `${animal.size} · ${animal.weight}`],
       ['Llegada', formatDate(animal.arrivalDate)],
-      ['Ejercicio', animal.exercise],
+      ['Ejercicio', exerciseLabel(animal.exercise)],
     ];
     document.querySelector('#quick-facts').innerHTML = facts.map(([label, value]) =>
       `<div class="fact ${label === 'Ejercicio' ? 'exercise-fact' : ''}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`
@@ -42,7 +42,7 @@
     document.querySelector('#care-grid').innerHTML = [
       ['♡', 'Carácter', animal.description],
       ['✚', 'Salud', animal.medicalDetail],
-      ['⌂', 'Actividad', animal.exercise],
+      ['⌂', 'Actividad', exerciseLabel(animal.exercise)],
       ['●', 'Necesita', animal.idealHome],
     ].map(([icon, title, copy]) =>
       `<div class="care-item"><span class="care-icon">${icon}</span><h3>${title}</h3><p>${escapeHtml(copy)}</p></div>`
@@ -66,6 +66,12 @@
   function statusLabel(status) {
     return { available: 'Disponible para adoptar', reserved: 'Reservado', adopted: 'Adoptado', medical: 'En cuidados' }[status];
   }
+  function exerciseLabel(value) {
+    const level = String(value || '').split('·')[0].trim().toLowerCase();
+    if (level.includes('alto')) return 'Alto';
+    if (level.includes('bajo')) return 'Bajo';
+    return 'Medio';
+  }
   function formatDate(date) {
     if (!date) return 'Sin indicar';
     return new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(date));
@@ -73,6 +79,14 @@
   function setupActions(animal) {
     const modal = document.querySelector('#action-modal');
     let currentAction = 'adoptar';
+    document.querySelectorAll('#donation-options button').forEach((button) => button.addEventListener('click', () => {
+      document.querySelectorAll('#donation-options button').forEach((option) => option.classList.remove('active'));
+      button.classList.add('active');
+      const amount = button.dataset.amount;
+      document.querySelector('[name="mensaje"]').value = amount === 'other'
+        ? `Hola, quiero hacer una donación para ayudar a ${animal.name}.`
+        : `Hola, quiero donar ${amount} € para ayudar a ${animal.name}.`;
+    }));
     document.querySelectorAll('[data-action]').forEach((button) => button.addEventListener('click', () => {
       const action = button.dataset.action;
       currentAction = action;

@@ -287,14 +287,15 @@
           </div>
 
           <label>
-            Ejercicio necesario
-            <input
+            Nivel de ejercicio
+            <select
               name="exercise"
               required
               [ngModel]="form().exercise"
               (ngModelChange)="updateForm('exercise', $event)"
-              placeholder="Ej. Moderado · 60 minutos al día"
-            />
+            >
+              <option>Bajo</option><option>Medio</option><option>Alto</option>
+            </select>
           </label>
 
           <label>
@@ -437,7 +438,7 @@
                     </div>
                     <div>
                       <dt>Ejercicio</dt>
-                      <dd>{{ animal.exercise }}</dd>
+                      <dd>{{ exerciseLabel(animal.exercise) }}</dd>
                     </div>
                   </dl>
 

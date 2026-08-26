@@ -66,7 +66,7 @@ const initialForm: AnimalForm = {
   arrivalDate: new Date().toISOString().slice(0, 10),
   description: '',
   notes: '',
-  exercise: '',
+  exercise: 'Medio',
   idealHome: '',
   medicalStatus: 'Sin enfermedades diagnosticadas',
   medicalDetail: '',
@@ -304,7 +304,7 @@ export class Dashboard implements OnInit {
       arrivalDate: form.arrivalDate,
       description: form.description.trim(),
       notes: form.notes.trim(),
-      exercise: form.exercise.trim(),
+      exercise: this.exerciseLabel(form.exercise),
       idealHome: form.idealHome.trim(),
       medicalStatus: form.medicalStatus.trim(),
       medicalDetail: form.medicalDetail.trim(),
@@ -339,6 +339,7 @@ export class Dashboard implements OnInit {
   }
 
   protected editAnimal(animal: ShelterAnimal): void {
+    this.showSection('new');
     this.editingId.set(animal.id);
     this.form.set({
       name: animal.name,
@@ -353,7 +354,7 @@ export class Dashboard implements OnInit {
       arrivalDate: animal.arrivalDate,
       description: animal.description,
       notes: animal.notes,
-      exercise: animal.exercise,
+      exercise: this.exerciseLabel(animal.exercise),
       idealHome: animal.idealHome,
       medicalStatus: animal.medicalStatus,
       medicalDetail: animal.medicalDetail,
@@ -441,5 +442,12 @@ export class Dashboard implements OnInit {
     };
 
     return labels[status];
+  }
+
+  protected exerciseLabel(value: string): string {
+    const level = value.split('·')[0].trim().toLowerCase();
+    if (level.includes('alto')) return 'Alto';
+    if (level.includes('bajo')) return 'Bajo';
+    return 'Medio';
   }
 }
