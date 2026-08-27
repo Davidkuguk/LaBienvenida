@@ -1,0 +1,4 @@
+.donation-links { display: grid; gap: 12px; margin-top: 24px; }
+.donation-links[hidden] { display: none; }
+.donation-links .button { display: block; width: 100%; text-align: center; }
+.donation-teaming { padding: 14px; border: 1px solid #1f5548; color: #1f5548; font-weight: 800; text-align: center; text-decoration: none; }

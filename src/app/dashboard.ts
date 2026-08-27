@@ -7,7 +7,6 @@ type FosterStatus = 'pending' | 'active' | 'finished';
 
 interface AdoptionRequest { id: string; animalId: string; animalName: string; name: string; email: string; phone: string; message: string; status: RequestStatus; createdAt: string; }
 interface Foster { id: string; animalId: string; animalName: string; carerName: string; phone: string; email: string; address: string; startDate: string; endDate: string; status: FosterStatus; notes: string; }
-interface ShelterSettings { name: string; email: string; phone: string; address: string; hours: string; instagram: string; facebook: string; }
 
 interface ShelterAnimal {
   id: string;
@@ -86,8 +85,7 @@ const initialForm: AnimalForm = {
   styleUrl: './dashboard.scss',
 })
 export class Dashboard implements OnInit {
-  protected readonly activeSection = signal<'new' | 'inventory' | 'requests' | 'fosters' | 'settings'>('new');
-  protected readonly settings = signal<ShelterSettings>({ name: 'La Bienvenida', email: '', phone: '', address: '', hours: '', instagram: '', facebook: '' });
+  protected readonly activeSection = signal<'new' | 'inventory' | 'requests' | 'fosters'>('new');
   protected readonly fosters = signal<Foster[]>([]);
   protected readonly fosterForm = signal<Omit<Foster, 'id'>>({ animalId: '', animalName: '', carerName: '', phone: '', email: '', address: '', startDate: new Date().toISOString().slice(0, 10), endDate: '', status: 'pending', notes: '' });
   /*
@@ -229,12 +227,8 @@ export class Dashboard implements OnInit {
     void this.loadAnimals();
     void this.loadRequests();
     void this.loadFosters();
-    void this.loadSettings();
   }
 
-  private async loadSettings(): Promise<void> { try { const response = await fetch('/.netlify/functions/animals?resource=settings'); const data = await response.json() as { settings?: ShelterSettings }; if (data.settings) this.settings.set(data.settings); } catch { /* Disponible al desplegar en Netlify. */ } }
-  protected updateSettings<K extends keyof ShelterSettings>(field: K, value: ShelterSettings[K]): void { this.settings.update((current) => ({ ...current, [field]: value })); }
-  protected async saveSettings(): Promise<void> { const response = await fetch('/.netlify/functions/animals?resource=settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(this.settings()) }); const data = await response.json().catch(() => null) as { settings?: ShelterSettings } | null; if (response.ok && data?.settings) this.settings.set(data.settings); }
 
   private async loadFosters(): Promise<void> {
     try { const response = await fetch('/.netlify/functions/fosters', { credentials: 'same-origin' }); const data = await response.json() as { fosters?: Foster[] }; if (response.ok && Array.isArray(data.fosters)) this.fosters.set(data.fosters); } catch { /* Solo disponible en Netlify. */ }
@@ -323,7 +317,7 @@ export class Dashboard implements OnInit {
     this.sidebarCollapsed.update((collapsed) => !collapsed);
   }
 
-  protected showSection(section: 'new' | 'inventory' | 'requests' | 'fosters' | 'settings'): void {
+  protected showSection(section: 'new' | 'inventory' | 'requests' | 'fosters'): void {
     this.activeSection.set(section);
   }
 

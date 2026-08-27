@@ -40,9 +40,6 @@
       <button type="button" [class.active]="activeSection() === 'inventory'" (click)="showSection('inventory')">Inventario</button>
       <button type="button" [class.active]="activeSection() === 'requests'" (click)="showSection('requests')">Solicitudes</button>
       <button type="button" [class.active]="activeSection() === 'fosters'" (click)="showSection('fosters')">Acogidas</button>
-      <button type="button" [class.active]="activeSection() === 'settings'" (click)="showSection('settings')">Ajustes</button>
-      <a href="#fosters">Acogidas</a>
-      <a href="#settings">Ajustes</a>
       <a href="/" target="_blank" rel="noopener">
         Ver sitio publico
       </a>
@@ -396,8 +393,6 @@
         </form>
         <div class="request-list">@for (foster of fosters(); track foster.id) { <article class="request-card"><div><strong>{{ foster.animalName }}</strong><span>{{ foster.carerName }} · {{ foster.status }}</span></div><p>{{ foster.phone }} · {{ foster.address }}</p></article> } @empty { <p class="requests-empty">No hay acogidas registradas.</p> }</div>
       </section>
-
-      <section class="panel form-panel" [hidden]="activeSection() !== 'settings'"><div class="panel-heading"><div><p class="eyebrow">Datos públicos</p><h2>Ajustes de la protectora</h2></div></div><form (ngSubmit)="saveSettings()"><label>Nombre<input name="settingName" [ngModel]="settings().name" (ngModelChange)="updateSettings('name', $event)" /></label><div class="field-row"><label>Correo<input type="email" name="settingEmail" [ngModel]="settings().email" (ngModelChange)="updateSettings('email', $event)" /></label><label>Teléfono<input name="settingPhone" [ngModel]="settings().phone" (ngModelChange)="updateSettings('phone', $event)" /></label></div><label>Dirección<input name="settingAddress" [ngModel]="settings().address" (ngModelChange)="updateSettings('address', $event)" /></label><label>Horarios<textarea name="settingHours" rows="2" [ngModel]="settings().hours" (ngModelChange)="updateSettings('hours', $event)"></textarea></label><div class="field-row"><label>Instagram<input name="settingInstagram" [ngModel]="settings().instagram" (ngModelChange)="updateSettings('instagram', $event)" /></label><label>Facebook<input name="settingFacebook" [ngModel]="settings().facebook" (ngModelChange)="updateSettings('facebook', $event)" /></label></div><button class="submit-button" type="submit">Guardar datos públicos</button></form></section>
 
       <section class="panel list-panel" [hidden]="activeSection() !== 'inventory'" id="inventory" aria-labelledby="animal-list-title">
         <div class="panel-heading list-heading">

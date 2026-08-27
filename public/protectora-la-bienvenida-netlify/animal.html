@@ -22,6 +22,8 @@
     <link rel="stylesheet" href="story-hero.css" />
     <link rel="stylesheet" href="photo-size.css" />
     <link rel="stylesheet" href="form-fixes.css" />
+    <link rel="stylesheet" href="donation-links.css" />
+    <link rel="stylesheet" href="animal-gallery.css" />
   </head>
   <body>
     <header class="site-header detail-header">
@@ -34,7 +36,7 @@
 
     <main id="animal-profile">
       <section class="profile-hero">
-        <div class="profile-image"><img id="animal-image" alt="" /></div>
+        <div class="profile-image"><img id="animal-image" alt="" /><div id="animal-thumbnails" class="animal-thumbnails" aria-label="Más fotos del animal"></div></div>
         <div class="profile-intro">
           <div class="profile-main">
             <span class="eyebrow" id="animal-status"></span>
@@ -96,9 +98,9 @@
         ><span class="eyebrow" id="modal-eyebrow"></span>
         <h2 id="modal-title"></h2>
         <p id="modal-copy"></p>
-        <div id="donation-options" class="donation-options" hidden>
-          <button type="button" data-amount="10">10 €</button><button type="button" class="active" data-amount="20">20 €</button><button type="button" data-amount="50">50 €</button
-          ><button type="button" data-amount="other">Otra cantidad</button>
+        <div id="donation-links" class="donation-links" hidden>
+          <a class="button" href="https://www.paypal.com/donate?token=9PVq9XwCsmWGDZqeBNE3oPrNE8FhpCQtPnJJnW8N_qrX-bbBAgX44DZn74OJKRw3iAyDrFzt5y3Znd-v&locale.x=ES" target="_blank" rel="noopener noreferrer">Donar con PayPal</a>
+          <a class="donation-teaming" href="https://www.teaming.net/protectoradeanimaleslabienvenida" target="_blank" rel="noopener noreferrer">Hazte Teaming por 1 € al mes →</a>
         </div>
         <form id="interest-form">
           <label>Nombre<input required name="nombre" placeholder="Tu nombre" /></label
@@ -111,6 +113,13 @@
           ><button class="button" type="submit" id="submit-action">Enviar solicitud</button>
         </form>
       </div>
+    </div>
+
+    <div id="photo-lightbox" class="photo-lightbox" hidden role="dialog" aria-modal="true" aria-label="Foto ampliada">
+      <button type="button" id="photo-lightbox-close" aria-label="Cerrar foto">×</button>
+      <button type="button" id="photo-previous" aria-label="Foto anterior">←</button>
+      <img id="photo-lightbox-image" alt="Foto ampliada del animal" />
+      <button type="button" id="photo-next" aria-label="Foto siguiente">→</button>
     </div>
 
     <footer class="detail-footer">

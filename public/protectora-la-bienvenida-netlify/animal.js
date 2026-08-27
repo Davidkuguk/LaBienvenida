@@ -22,6 +22,7 @@
     const image = document.querySelector('#animal-image');
     image.src = animal.photos[0] || '';
     image.alt = `${animal.name}, animal en adopción`;
+    setupGallery(animal.photos, animal.name);
     document.querySelector('#animal-status').textContent = statusLabel(animal.status);
     document.querySelector('#animal-name').textContent = animal.name;
     document.querySelector('#story-title').textContent = `Conoce a ${animal.name}`;
@@ -79,14 +80,6 @@
   function setupActions(animal) {
     const modal = document.querySelector('#action-modal');
     let currentAction = 'adoptar';
-    document.querySelectorAll('#donation-options button').forEach((button) => button.addEventListener('click', () => {
-      document.querySelectorAll('#donation-options button').forEach((option) => option.classList.remove('active'));
-      button.classList.add('active');
-      const amount = button.dataset.amount;
-      document.querySelector('[name="mensaje"]').value = amount === 'other'
-        ? `Hola, quiero hacer una donación para ayudar a ${animal.name}.`
-        : `Hola, quiero donar ${amount} € para ayudar a ${animal.name}.`;
-    }));
     document.querySelectorAll('[data-action]').forEach((button) => button.addEventListener('click', () => {
       const action = button.dataset.action;
       currentAction = action;
@@ -97,7 +90,11 @@
       document.querySelector('[name="telefono"]').closest('label').hidden = action !== 'adoptar';
       document.querySelector('[name="consentimiento"]').closest('label').hidden = action !== 'adoptar';
       document.querySelector('#form-status').textContent = '';
-      document.querySelector('#donation-options').hidden = action !== 'donar';
+      document.querySelector('#donation-links').hidden = action !== 'donar';
+      document.querySelector('#interest-form').hidden = action === 'donar';
+      if (action === 'donar') {
+        document.querySelector('#modal-copy').textContent = 'Elige cómo quieres ayudar a los animales de La Bienvenida.';
+      }
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
     }));
@@ -126,6 +123,28 @@
       } catch (error) { status.textContent = error.message || 'No se pudo enviar la solicitud.'; }
       finally { submit.disabled = false; }
     });
+  }
+
+  function setupGallery(photos, name) {
+    const images = photos.length ? photos : [''];
+    const main = document.querySelector('#animal-image');
+    const thumbnails = document.querySelector('#animal-thumbnails');
+    const lightbox = document.querySelector('#photo-lightbox');
+    const lightboxImage = document.querySelector('#photo-lightbox-image');
+    let current = 0;
+    const select = (index) => {
+      current = (index + images.length) % images.length;
+      main.src = images[current];
+      lightboxImage.src = images[current];
+      thumbnails.querySelectorAll('button').forEach((button, buttonIndex) => button.classList.toggle('active', buttonIndex === current));
+    };
+    thumbnails.innerHTML = images.map((photo, index) => `<button type="button" aria-label="Ver foto ${index + 1} de ${name}"><img src="${escapeHtml(photo)}" alt="Miniatura ${index + 1} de ${name}"></button>`).join('');
+    thumbnails.querySelectorAll('button').forEach((button, index) => button.addEventListener('click', () => select(index)));
+    main.addEventListener('click', () => { if (images[0]) { lightbox.hidden = false; select(current); } });
+    document.querySelector('#photo-lightbox-close').addEventListener('click', () => { lightbox.hidden = true; });
+    document.querySelector('#photo-previous').addEventListener('click', () => select(current - 1));
+    document.querySelector('#photo-next').addEventListener('click', () => select(current + 1));
+    select(0);
   }
 })();
 
