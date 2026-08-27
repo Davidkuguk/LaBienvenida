@@ -107,7 +107,8 @@
     }));
     document.querySelector('#interest-form').addEventListener('submit', async (event) => {
       event.preventDefault();
-      const form = new FormData(event.currentTarget);
+      const formElement = event.currentTarget;
+      const form = new FormData(formElement);
       const status = document.querySelector('#form-status');
       if (currentAction !== 'adoptar') {
         location.href = `mailto:petercanespejos@gmail.com?subject=${encodeURIComponent(`Interés en ${animal.name}`)}&body=${encodeURIComponent(`Nombre: ${form.get('nombre')}\nEmail: ${form.get('email')}\n\n${form.get('mensaje')}`)}`;
@@ -120,7 +121,7 @@
         const response = await fetch('/.netlify/functions/requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ animalId: animal.id, animalName: animal.name, name: form.get('nombre'), email: form.get('email'), phone: form.get('telefono'), message: form.get('mensaje') }) });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'No se pudo enviar la solicitud.');
-        event.currentTarget.reset();
+        formElement.reset();
         status.textContent = 'Solicitud enviada. Nos pondremos en contacto contigo pronto.';
       } catch (error) { status.textContent = error.message || 'No se pudo enviar la solicitud.'; }
       finally { submit.disabled = false; }
