@@ -15,7 +15,8 @@
     });
     if (!response.ok) throw new Error();
     const { animals } = await response.json();
-    grid.innerHTML = animals.map((animal) => {
+    const orderedAnimals = [...animals].sort((left, right) => Number(Boolean(right.urgent)) - Number(Boolean(left.urgent)));
+    grid.innerHTML = orderedAnimals.map((animal) => {
       const photos = Array.isArray(animal.photos) && animal.photos.length ? animal.photos : [''];
       const photoButtons = photos.length > 1 ? `
             <button class="catalog-gallery-arrow catalog-gallery-prev" type="button" aria-label="Ver foto anterior de ${escapeHtml(animal.name)}">‹</button>
@@ -28,7 +29,7 @@
         tabindex="0" role="link" data-animal-id="${encodeURIComponent(animal.id)}">
         <div class="photo catalog-photo" data-photos="${escapeHtml(JSON.stringify(photos))}" data-current-photo="0">
           <img src="${escapeHtml(photos[0])}" alt="${escapeHtml(animal.name)} — foto 1 de ${photos.length}">
-          ${animal.status !== 'available' ? `<span>${escapeHtml(statusLabel(animal.status))}</span>` : ''}
+          ${animal.urgent ? '<span class="urgent">Urgente</span>' : animal.status !== 'available' ? `<span>${escapeHtml(statusLabel(animal.status))}</span>` : ''}
           ${photoButtons}
         </div>
         <div class="animal-info">
@@ -59,7 +60,7 @@
         count.textContent = `${visible} ${visible === 1 ? 'animal' : 'animales'}`;
       };
     });
-    count.textContent = `${animals.length} ${animals.length === 1 ? 'animal' : 'animales'}`;
+    count.textContent = `${orderedAnimals.length} ${orderedAnimals.length === 1 ? 'animal' : 'animales'}`;
   } catch {
     grid.innerHTML = '<p class="catalog-error">No hemos podido cargar los animales. Inténtalo de nuevo en unos minutos.</p>';
     count.textContent = 'Datos no disponibles';

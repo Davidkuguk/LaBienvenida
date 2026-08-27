@@ -11,6 +11,7 @@ export interface AnimalRecord {
   size: 'Pequeno' | 'Mediano' | 'Grande';
   weight: string;
   status: AnimalStatus;
+  urgent: boolean;
   arrivalDate: string;
   description: string;
   notes: string;
@@ -62,6 +63,7 @@ export const initialAnimals: AnimalRecord[] = basics.map((animal, index) => ({
   exercise: animal[9],
   photos: [images[index]],
   status: 'available',
+  urgent: false,
   arrivalDate: '2026-01-01',
   notes: `${animal[1]} busca una familia responsable que le ofrezca tiempo, cariño y estabilidad.`,
   idealHome: 'Un hogar responsable con rutinas estables y mucho cariño.',

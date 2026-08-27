@@ -737,6 +737,13 @@ textarea:focus {
   text-align: center;
 }
 
+.animal-labels { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.status-pill.urgent { color: #8e2b12; background: #ffe0d2; }
+.urgent-field { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #d7e1d1; border-radius: 8px; cursor: pointer; }
+.urgent-field input { width: 18px; height: 18px; }
+.urgent-field span { display: grid; gap: 3px; }
+.urgent-field small { color: #657561; }
+
 .undo-notice {
   display: flex;
   align-items: center;

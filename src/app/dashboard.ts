@@ -19,6 +19,7 @@ interface ShelterAnimal {
   size: 'Pequeno' | 'Mediano' | 'Grande';
   weight: string;
   status: AnimalStatus;
+  urgent: boolean;
   arrivalDate: string;
   description: string;
   notes: string;
@@ -42,6 +43,7 @@ interface AnimalForm {
   size: ShelterAnimal['size'];
   weight: string;
   status: AnimalStatus;
+  urgent: boolean;
   arrivalDate: string;
   description: string;
   notes: string;
@@ -65,6 +67,7 @@ const initialForm: AnimalForm = {
   size: 'Mediano',
   weight: '',
   status: 'available',
+  urgent: false,
   arrivalDate: new Date().toISOString().slice(0, 10),
   description: '',
   notes: '',
@@ -364,6 +367,7 @@ export class Dashboard implements OnInit {
       size: form.size,
       weight: form.weight.trim(),
       status: form.status,
+      urgent: form.urgent,
       arrivalDate: form.arrivalDate,
       description: form.description.trim(),
       notes: form.notes.trim(),
@@ -414,6 +418,7 @@ export class Dashboard implements OnInit {
       size: animal.size,
       weight: animal.weight,
       status: animal.status,
+      urgent: Boolean(animal.urgent),
       arrivalDate: animal.arrivalDate,
       description: animal.description,
       notes: animal.notes,
@@ -426,6 +431,10 @@ export class Dashboard implements OnInit {
       compatibleDogs: animal.compatibleDogs,
       compatibleCats: animal.compatibleCats,
     });
+  }
+
+  protected openPublicAnimal(animal: ShelterAnimal): void {
+    window.open(`/animal?id=${encodeURIComponent(animal.id)}`, '_blank', 'noopener');
   }
 
   protected async removeAnimal(id: string): Promise<void> {

@@ -188,6 +188,10 @@
                 <option value="medical">En cuidados medicos</option>
               </select>
             </label>
+            <label class="urgent-field">
+              <input type="checkbox" name="urgent" [ngModel]="form().urgent" (ngModelChange)="updateForm('urgent', $event)" />
+              <span><b>Urgente</b><small>Mostrar primero en la página pública.</small></span>
+            </label>
             <label>
               Fecha de entrada
               <input
@@ -464,7 +468,10 @@
                       <h3>{{ animal.name }}</h3>
                       <p>{{ animal.species }} · {{ animal.breed }} · {{ animal.age }} anos</p>
                     </div>
-                    <span class="status-pill" [class]="animal.status">{{ statusLabel(animal.status) }}</span>
+                    <div class="animal-labels">
+                      @if (animal.urgent) { <span class="status-pill urgent">Urgente</span> }
+                      <span class="status-pill" [class]="animal.status">{{ statusLabel(animal.status) }}</span>
+                    </div>
                   </div>
 
                   <p class="description">{{ animal.description }}</p>
@@ -518,6 +525,7 @@
                   </div>
 
                   <div class="card-actions">
+                    <button type="button" (click)="openPublicAnimal(animal)">Ver en la web</button>
                     <button type="button" (click)="editAnimal(animal)">Editar</button>
                     <button class="danger" type="button" (click)="removeAnimal(animal.id)">Eliminar</button>
                   </div>
