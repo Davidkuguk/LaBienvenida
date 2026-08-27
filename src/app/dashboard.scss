@@ -531,6 +531,31 @@ textarea:focus {
   grid-column: 1 / -1;
 }
 
+.input-invalid {
+  border-color: #c94e35 !important;
+  background: #fff3ef !important;
+  box-shadow: 0 0 0 3px rgb(201 78 53 / 14%);
+}
+
+.photo-preview-grid figcaption {
+  padding: 6px;
+  color: #fff;
+  background: var(--green);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.photo-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.photo-actions button {
+  width: auto !important;
+  padding: 6px !important;
+}
+
 .form-panel {
   grid-column: 1 / -1;
   width: min(100%, 900px);

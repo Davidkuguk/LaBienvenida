@@ -104,7 +104,7 @@
           }
         </div>
 
-        <form (ngSubmit)="saveAnimal()" #animalForm="ngForm">
+        <form novalidate (ngSubmit)="saveAnimal()" #animalForm="ngForm">
           @if (saveError()) {
             <p class="form-error" role="alert">{{ saveError() }}</p>
           }
@@ -118,6 +118,7 @@
             <input
               name="name"
               required
+              [class.input-invalid]="showValidation() && !form().name.trim()"
               [ngModel]="form().name"
               (ngModelChange)="updateForm('name', $event)"
               placeholder="Ej. Lola"
@@ -138,8 +139,9 @@
             <label>
               Raza
               <input
-                name="breed"
-                required
+              name="breed"
+              required
+              [class.input-invalid]="showValidation() && !form().breed.trim()"
                 [ngModel]="form().breed"
                 (ngModelChange)="updateForm('breed', $event)"
                 placeholder="Mestizo, podenco..."
@@ -153,8 +155,9 @@
               <input
                 name="age"
                 required
-                min="0"
-                type="number"
+              min="0"
+              type="number"
+              [class.input-invalid]="showValidation() && form().age === null"
                 [ngModel]="form().age"
                 (ngModelChange)="updateForm('age', $event === '' ? null : +$event)"
               />
@@ -263,6 +266,7 @@
             <textarea
               name="description"
               required
+              [class.input-invalid]="showValidation() && !form().description.trim()"
               rows="2"
               [ngModel]="form().description"
               (ngModelChange)="updateForm('description', $event)"
@@ -327,21 +331,27 @@
           <div class="photo-field">
             <label for="animal-photos">Fotos de la mascota</label>
             <input id="animal-photos" type="file" accept="image/*" multiple (change)="addPhotos($event)" />
-            <span>Puedes seleccionar varias imagenes a la vez.</span>
+            <span>La primera foto será la principal. Las imágenes se optimizan automáticamente antes de guardarse.</span>
 
             @if (form().photos.length) {
               <div class="photo-preview-grid" aria-label="Fotos seleccionadas">
                 @for (photo of form().photos; track photo; let index = $index) {
                   <figure>
                     <img [src]="photo" alt="Foto seleccionada de la mascota" />
-                    <button type="button" (click)="removePhoto(index)" aria-label="Quitar foto">Quitar</button>
+                    @if (index === 0) { <figcaption>Foto principal</figcaption> }
+                    <div class="photo-actions">
+                      @if (index > 0) { <button type="button" (click)="makePrimaryPhoto(index)">Principal</button> }
+                      @if (index > 0) { <button type="button" (click)="movePhoto(index, index - 1)" aria-label="Mover foto a la izquierda">←</button> }
+                      @if (index < form().photos.length - 1) { <button type="button" (click)="movePhoto(index, index + 1)" aria-label="Mover foto a la derecha">→</button> }
+                      <button type="button" (click)="removePhoto(index)" aria-label="Quitar foto">Quitar</button>
+                    </div>
                   </figure>
                 }
               </div>
             }
           </div>
 
-          <button class="submit-button" type="submit" [disabled]="animalForm.invalid || saving()">
+          <button class="submit-button" type="submit" [disabled]="saving()">
             {{ saving() ? 'Guardando…' : editingId() ? 'Guardar cambios' : 'Registrar animal' }}
           </button>
         </form>

@@ -164,6 +164,7 @@ export class Dashboard implements OnInit {
   protected readonly animalsLoading = signal(true);
   protected readonly saveError = signal('');
   protected readonly saving = signal(false);
+  protected readonly showValidation = signal(false);
   protected readonly statusFilter = signal<AnimalStatus | 'all'>('all');
   protected readonly searchTerm = signal('');
   protected readonly sidebarCollapsed = signal(false);
@@ -287,6 +288,14 @@ export class Dashboard implements OnInit {
     const form = this.form();
 
     if (!form.name.trim() || !form.breed.trim() || !form.description.trim() || form.age === null) {
+      this.showValidation.set(true);
+      const missing = [
+        !form.name.trim() && 'nombre',
+        !form.breed.trim() && 'raza',
+        form.age === null && 'edad',
+        !form.description.trim() && 'frase de presentación',
+      ].filter(Boolean);
+      this.saveError.set(`Completa los campos obligatorios: ${missing.join(', ')}.`);
       return;
     }
 
@@ -399,6 +408,8 @@ export class Dashboard implements OnInit {
 
   protected resetForm(): void {
     this.editingId.set(null);
+    this.showValidation.set(false);
+    this.saveError.set('');
     this.form.set({ ...initialForm, arrivalDate: new Date().toISOString().slice(0, 10) });
   }
 
@@ -410,7 +421,7 @@ export class Dashboard implements OnInit {
       return;
     }
 
-    Promise.all(files.map((file) => this.readFileAsDataUrl(file))).then((photos) => {
+    Promise.all(files.map((file) => this.compressPhoto(file))).then((photos) => {
       this.form.update((current) => ({ ...current, photos: [...current.photos, ...photos] }));
       input.value = '';
     });
@@ -423,11 +434,35 @@ export class Dashboard implements OnInit {
     }));
   }
 
-  private readFileAsDataUrl(file: File): Promise<string> {
+  protected makePrimaryPhoto(index: number): void {
+    this.movePhoto(index, 0);
+  }
+
+  protected movePhoto(index: number, destination: number): void {
+    this.form.update((current) => {
+      const photos = [...current.photos];
+      const [photo] = photos.splice(index, 1);
+      photos.splice(destination, 0, photo);
+      return { ...current, photos };
+    });
+  }
+
+  private compressPhoto(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-
-      reader.onload = () => resolve(String(reader.result));
+      reader.onload = () => {
+        const image = new Image();
+        image.onload = () => {
+          const scale = Math.min(1, 1600 / Math.max(image.width, image.height));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(image.width * scale);
+          canvas.height = Math.round(image.height * scale);
+          canvas.getContext('2d')?.drawImage(image, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/webp', 0.82));
+        };
+        image.onerror = () => reject(new Error('No se pudo procesar la imagen.'));
+        image.src = String(reader.result);
+      };
       reader.onerror = () => reject(reader.error);
       reader.readAsDataURL(file);
     });
