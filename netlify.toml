@@ -4,3 +4,18 @@ publish = "dist/la-bienvenida/browser"
 
 [functions]
 directory = "netlify/functions"
+
+[[headers]]
+for = "/*"
+
+[headers.values]
+X-Content-Type-Options = "nosniff"
+X-Frame-Options = "DENY"
+Referrer-Policy = "strict-origin-when-cross-origin"
+Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+for = "/protectora-la-bienvenida-netlify/assets/*"
+
+[headers.values]
+Cache-Control = "public, max-age=604800, must-revalidate"

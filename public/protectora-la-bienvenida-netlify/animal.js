@@ -6,19 +6,16 @@
     })[character]);
 
   try {
-    const response = await fetch('/.netlify/functions/animals', {
+    const response = await fetch(`/.netlify/functions/animals?id=${encodeURIComponent(id)}`, {
       headers: { Accept: 'application/json' },
-      cache: 'no-store',
     });
     if (!response.ok) throw new Error();
-    const { animals } = await response.json();
-    const animal = animals.find((item) => item.id === id);
-    if (!animal) {
-      location.replace('/adopta');
-      return;
-    }
+    if (response.status === 404) return location.replace('/adopta');
+    const { animal } = await response.json();
+    if (!animal) throw new Error();
 
     document.title = `${animal.name} busca hogar · La Bienvenida`;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', `${animal.name}, ${animal.species.toLowerCase()} en adopción en La Bienvenida. ${animal.description}`);
     const image = document.querySelector('#animal-image');
     image.src = animal.photos[0] || '';
     image.alt = `${animal.name}, animal en adopción`;
@@ -80,6 +77,12 @@
   function setupActions(animal) {
     const modal = document.querySelector('#action-modal');
     let currentAction = 'adoptar';
+    let previousFocus = null;
+    const closeModal = () => {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      previousFocus?.focus();
+    };
     document.querySelectorAll('[data-action]').forEach((button) => button.addEventListener('click', () => {
       const action = button.dataset.action;
       currentAction = action;
@@ -95,13 +98,16 @@
       if (action === 'donar') {
         document.querySelector('#modal-copy').textContent = 'Elige cómo quieres ayudar a los animales de La Bienvenida.';
       }
+      previousFocus = button;
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
+      modal.querySelector('.modal-close')?.focus();
     }));
-    document.querySelectorAll('[data-close]').forEach((element) => element.addEventListener('click', () => {
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-    }));
+    document.querySelectorAll('[data-close]').forEach((element) => element.addEventListener('click', closeModal));
+    modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
+    });
     document.querySelector('#interest-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       const formElement = event.currentTarget;
@@ -132,19 +138,51 @@
     const lightbox = document.querySelector('#photo-lightbox');
     const lightboxImage = document.querySelector('#photo-lightbox-image');
     let current = 0;
+    let startX = null;
     const select = (index) => {
       current = (index + images.length) % images.length;
       main.src = images[current];
       lightboxImage.src = images[current];
-      thumbnails.querySelectorAll('button').forEach((button, buttonIndex) => button.classList.toggle('active', buttonIndex === current));
+      thumbnails.querySelectorAll('button').forEach((button, buttonIndex) => {
+        const active = buttonIndex === current;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-current', String(active));
+      });
+    };
+    const openLightbox = () => {
+      if (!images[0]) return;
+      lightbox.hidden = false;
+      select(current);
+      document.querySelector('#photo-lightbox-close').focus();
+    };
+    const closeLightbox = () => {
+      lightbox.hidden = true;
+      main.focus();
     };
     thumbnails.hidden = images.length < 2;
     thumbnails.innerHTML = images.map((_, index) => `<button type="button" aria-label="Ver foto ${index + 1} de ${name}"></button>`).join('');
     thumbnails.querySelectorAll('button').forEach((button, index) => button.addEventListener('click', () => select(index)));
-    main.addEventListener('click', () => { if (images[0]) { lightbox.hidden = false; select(current); } });
-    document.querySelector('#photo-lightbox-close').addEventListener('click', () => { lightbox.hidden = true; });
+    main.tabIndex = 0;
+    main.setAttribute('role', 'button');
+    main.setAttribute('aria-label', `Ampliar fotos de ${name}`);
+    main.addEventListener('click', openLightbox);
+    main.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox(); } });
+    document.querySelector('#photo-lightbox-close').addEventListener('click', closeLightbox);
     document.querySelector('#photo-previous').addEventListener('click', () => select(current - 1));
     document.querySelector('#photo-next').addEventListener('click', () => select(current + 1));
+    lightbox.addEventListener('touchstart', (event) => { startX = event.changedTouches[0].clientX; }, { passive: true });
+    lightbox.addEventListener('touchend', (event) => {
+      if (startX === null) return;
+      const distance = event.changedTouches[0].clientX - startX;
+      startX = null;
+      if (Math.abs(distance) > 35) select(current + (distance < 0 ? 1 : -1));
+    }, { passive: true });
+    document.addEventListener('keydown', (event) => {
+      if (lightbox.hidden) return;
+      if (event.key === 'Escape') closeLightbox();
+      if (event.key === 'ArrowLeft') select(current - 1);
+      if (event.key === 'ArrowRight') select(current + 1);
+    });
     select(0);
   }
 })();

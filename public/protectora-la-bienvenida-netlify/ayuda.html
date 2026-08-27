@@ -4,7 +4,14 @@
     <meta charset="UTF-8" />
     <base href="/protectora-la-bienvenida-netlify/" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="Ayuda a La Bienvenida mediante voluntariado, acogida, Teaming o una donación segura con PayPal." />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#16332d" />
     <title>Cómo ayudar · La Bienvenida</title>
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fraunces:wght@600;700&display=swap"
       rel="stylesheet"
@@ -12,6 +19,7 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="access.css" />
     <link rel="stylesheet" href="pages.css" />
+    <link rel="stylesheet" href="responsive.css" />
   </head>
   <body>
     <header class="site-header">
@@ -19,7 +27,7 @@
         ><span class="brand-mark">♥</span
         ><span><strong>La Bienvenida</strong><small>Protectora de animales</small></span></a
       ><button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰</button>
-      <nav class="nav">
+      <nav class="nav" aria-label="Navegación principal">
         <a href="index.html">Inicio</a><a href="adopta.html">Adopta</a
         ><a href="nosotros.html">Nosotros</a
         ><a class="active" href="ayuda.html" aria-current="page">Cómo ayudar</a
@@ -32,6 +40,8 @@
           <img
             src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1200&q=85"
             alt="Voluntarios colaborando"
+            fetchpriority="high"
+            decoding="async"
           />
         </div>
         <div class="help-content reveal">

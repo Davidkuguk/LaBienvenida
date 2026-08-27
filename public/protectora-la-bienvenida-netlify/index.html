@@ -8,7 +8,11 @@
       name="description"
       content="Protectora La Bienvenida. Adopta, acoge o colabora con nuestros animales en Ciudad Real."
     />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#16332d" />
     <title>La Bienvenida · Protectora de Animales</title>
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preload" as="image" href="./assets/hero-refugio.jpg" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -19,6 +23,7 @@
     <link rel="stylesheet" href="access.css" />
     <link rel="stylesheet" href="hero-mobile.css" />
     <link rel="stylesheet" href="home.css" />
+    <link rel="stylesheet" href="responsive.css" />
   </head>
   <body>
     <header class="site-header" id="inicio">
@@ -44,6 +49,9 @@
           src="./assets/hero-refugio.jpg"
           alt="Un perro y un gato rescatados descansan juntos en la puerta del refugio"
           fetchpriority="high"
+          decoding="async"
+          width="1672"
+          height="941"
         />
         <div class="hero-overlay"></div>
         <div class="hero-content reveal">

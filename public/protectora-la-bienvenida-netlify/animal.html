@@ -5,7 +5,10 @@
     <base href="/protectora-la-bienvenida-netlify/" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Conoce a nuestros animales en adopción en La Bienvenida." />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#16332d" />
     <title>Conoce a nuestros animales · La Bienvenida</title>
+    <link rel="icon" href="/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -24,6 +27,7 @@
     <link rel="stylesheet" href="form-fixes.css" />
     <link rel="stylesheet" href="donation-links.css" />
     <link rel="stylesheet" href="animal-gallery.css" />
+    <link rel="stylesheet" href="responsive.css" />
   </head>
   <body>
     <header class="site-header detail-header">
@@ -36,7 +40,7 @@
 
     <main id="animal-profile">
       <section class="profile-hero">
-        <div class="profile-image"><img id="animal-image" alt="" /><div id="animal-thumbnails" class="animal-thumbnails" aria-label="Más fotos del animal"></div></div>
+        <div class="profile-image"><img id="animal-image" alt="" decoding="async" /><div id="animal-thumbnails" class="animal-thumbnails" aria-label="Más fotos del animal"></div></div>
         <div class="profile-intro">
           <div class="profile-main">
             <span class="eyebrow" id="animal-status"></span>
@@ -118,7 +122,7 @@
     <div id="photo-lightbox" class="photo-lightbox" hidden role="dialog" aria-modal="true" aria-label="Foto ampliada">
       <button type="button" id="photo-lightbox-close" aria-label="Cerrar foto">×</button>
       <button type="button" id="photo-previous" aria-label="Foto anterior">←</button>
-      <img id="photo-lightbox-image" alt="Foto ampliada del animal" />
+      <img id="photo-lightbox-image" alt="Foto ampliada del animal" decoding="async" />
       <button type="button" id="photo-next" aria-label="Foto siguiente">→</button>
     </div>
 

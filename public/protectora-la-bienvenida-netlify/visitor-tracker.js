@@ -2,7 +2,8 @@
   const visitorKey = 'la-bienvenida-visitor-id';
   const sessionKey = 'la-bienvenida-visit-recorded';
 
-  try {
+  const trackVisit = () => {
+    try {
     if (sessionStorage.getItem(sessionKey)) {
       return;
     }
@@ -30,7 +31,11 @@
       .catch(() => {
         // El contador solo está disponible cuando la web se ejecuta en Netlify.
       });
-  } catch {
-    // No se realiza seguimiento si el navegador bloquea el almacenamiento local.
-  }
+    } catch {
+      // No se realiza seguimiento si el navegador bloquea el almacenamiento local.
+    }
+  };
+
+  if ('requestIdleCallback' in window) window.requestIdleCallback(trackVisit, { timeout: 2000 });
+  else window.setTimeout(trackVisit, 1000);
 })();

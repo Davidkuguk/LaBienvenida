@@ -1,0 +1,378 @@
+/* Ajustes fluidos compartidos por todas las páginas públicas. */
+html {
+  min-width: 280px;
+}
+
+body {
+  overflow-x: clip;
+}
+
+main,
+section,
+article,
+header,
+footer,
+.profile-intro,
+.animal-info,
+.home-section-card {
+  min-width: 0;
+}
+
+:where(h1, h2, h3, p, a, strong, small, span, blockquote) {
+  overflow-wrap: anywhere;
+}
+
+.animal-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.steps,
+.care-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+.animal-info,
+.next-animal,
+.detail-footer,
+.footer-bottom {
+  gap: 18px;
+}
+
+.animal-info > div,
+.contact-grid > div,
+.footer-brand > div {
+  min-width: 0;
+}
+
+.contact-grid a,
+footer a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.modal-panel h2,
+.profile-main h1 {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1100px) {
+  .site-header {
+    height: 72px;
+  }
+
+  .menu-toggle {
+    display: block;
+    flex: 0 0 auto;
+  }
+
+  .nav {
+    position: absolute;
+    top: 72px;
+    right: 0;
+    left: 0;
+    display: none;
+    max-height: calc(100dvh - 72px);
+    overflow-y: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 22px 5vw 28px;
+    background: var(--paper);
+    box-shadow: 0 18px 30px rgb(22 51 45 / 14%);
+  }
+
+  .nav.open {
+    display: flex;
+  }
+
+  .nav > a {
+    width: 100%;
+    padding: 10px 4px;
+  }
+
+  .nav > .button,
+  .nav > .access-link {
+    justify-content: center;
+    padding: 12px 16px;
+  }
+
+  .hero {
+    height: calc(100svh - 72px);
+    min-height: 620px;
+  }
+
+  .hero-note {
+    display: none;
+  }
+
+  .section-heading,
+  .intro-copy {
+    gap: clamp(28px, 6vw, 70px);
+  }
+
+  .profile-content {
+    gap: 6vw;
+  }
+}
+
+@media (max-width: 850px) {
+  .hero {
+    height: max(640px, calc(100svh - 72px));
+  }
+
+  .hero-content {
+    top: 48%;
+  }
+
+  .hero h1 {
+    font-size: clamp(42px, 10vw, 58px);
+    line-height: 1;
+    letter-spacing: -1.7px;
+  }
+
+  .section-heading h1,
+  .intro h1,
+  .help h1,
+  .contact-intro h1,
+  .home-sections-heading h2 {
+    font-size: clamp(38px, 9vw, 58px);
+    letter-spacing: -1.2px;
+  }
+
+  .help-photo {
+    min-height: clamp(320px, 65vw, 480px);
+  }
+
+  .profile-image {
+    height: clamp(320px, 72vw, 520px);
+    min-height: 0;
+    max-height: none;
+  }
+
+  .profile-main h1 {
+    font-size: clamp(54px, 14vw, 76px);
+    line-height: 0.95;
+    letter-spacing: -2px;
+  }
+
+  .profile-intro,
+  .profile-content,
+  .care-section,
+  .compatibility {
+    padding-right: 6vw;
+    padding-left: 6vw;
+  }
+
+  .action-card {
+    padding: clamp(24px, 6vw, 38px);
+  }
+
+  .contact-grid a {
+    font-size: clamp(18px, 5vw, 23px);
+  }
+}
+
+@media (max-width: 520px) {
+  .site-header {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .brand {
+    min-width: 0;
+    gap: 9px;
+  }
+
+  .brand strong {
+    font-size: 16px;
+    line-height: 1.1;
+  }
+
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+  }
+
+  .hero {
+    min-height: 600px;
+  }
+
+  .hero-content {
+    right: 20px;
+    left: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(38px, 12vw, 48px);
+  }
+
+  .hero-actions,
+  .hero-actions-detail,
+  .amounts {
+    width: 100%;
+  }
+
+  .hero-actions .button,
+  .hero-actions-detail .button,
+  .donate .button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .intro,
+  .animals,
+  .process,
+  .home-sections,
+  .story-band,
+  .contact-page,
+  .donate {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .home-section-card {
+    min-height: 0;
+    padding: 25px 22px;
+  }
+
+  .home-section-card h3 {
+    margin-top: 20px;
+    font-size: clamp(32px, 11vw, 42px);
+  }
+
+  .steps,
+  .care-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .filter {
+    flex: 0 0 auto;
+  }
+
+  .photo {
+    height: clamp(300px, 105vw, 380px);
+  }
+
+  .animal-info {
+    align-items: flex-start;
+    padding: 18px;
+  }
+
+  .circle-button {
+    flex: 0 0 auto;
+  }
+
+  .profile-main h1 {
+    font-size: clamp(44px, 17vw, 64px);
+  }
+
+  .profile-intro {
+    padding-top: 38px;
+    padding-bottom: 42px;
+  }
+
+  .profile-intro .profile-compatibility {
+    padding: 17px;
+  }
+
+  .compat-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .compat-row b {
+    max-width: 100%;
+    white-space: normal;
+    text-align: left;
+  }
+
+  .medical-status {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 20px;
+  }
+
+  .medical-icon,
+  .medical-badge {
+    grid-column: 1;
+  }
+
+  .modal-panel {
+    width: 100%;
+    padding: 60px 20px 28px;
+  }
+
+  .modal-panel h2 {
+    font-size: clamp(30px, 10vw, 40px);
+  }
+
+  .photo-lightbox {
+    grid-template-columns: 1fr;
+    padding: 56px 14px 18px;
+  }
+
+  .photo-lightbox img {
+    max-height: calc(100dvh - 90px);
+  }
+
+  #photo-previous,
+  #photo-next {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    width: 44px;
+    height: 50px;
+    transform: translateY(-50%);
+  }
+
+  #photo-previous {
+    left: 10px;
+  }
+
+  #photo-next {
+    right: 10px;
+  }
+
+  .next-animal,
+  .detail-footer {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .detail-footer > a {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .site-header {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+  }
+
+  .brand strong {
+    font-size: 15px;
+  }
+
+  .button {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .animal-info h3 {
+    font-size: 27px;
+  }
+}

@@ -543,12 +543,12 @@ export class Dashboard implements OnInit {
       reader.onload = () => {
         const image = new Image();
         image.onload = () => {
-          const scale = Math.min(1, 1600 / Math.max(image.width, image.height));
+          const scale = Math.min(1, 1280 / Math.max(image.width, image.height));
           const canvas = document.createElement('canvas');
           canvas.width = Math.round(image.width * scale);
           canvas.height = Math.round(image.height * scale);
           canvas.getContext('2d')?.drawImage(image, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL('image/webp', 0.82));
+          resolve(canvas.toDataURL('image/webp', 0.78));
         };
         image.onerror = () => reject(new Error('No se pudo procesar la imagen.'));
         image.src = String(reader.result);

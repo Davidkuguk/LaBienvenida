@@ -47,6 +47,42 @@ async function readAnimals(): Promise<AnimalRecord[]> {
   return ((await store().get(key, { type: 'json' })) as AnimalRecord[] | null) ?? initialAnimals;
 }
 
+function publicAnimal(animal: AnimalRecord): AnimalRecord {
+  return {
+    ...animal,
+    photos: animal.photos.map(
+      (_, index) => `/.netlify/functions/animals?id=${encodeURIComponent(animal.id)}&photo=${index}`,
+    ),
+  };
+}
+
+function catalogAnimal(animal: AnimalRecord) {
+  const { id, name, species, age, sex, size, status, urgent } = animal;
+  return { id, name, species, age, sex, size, status, urgent, photos: publicAnimal(animal).photos };
+}
+
+function photoResponse(photo: string | undefined): Response {
+  if (!photo) return Response.json({ error: 'Foto no encontrada' }, { status: 404 });
+  if (/^https?:\/\//i.test(photo)) return Response.redirect(photo, 302);
+
+  const match = /^data:([^;,]+)(;base64)?,(.*)$/s.exec(photo);
+  if (!match) return Response.json({ error: 'Formato de foto no válido' }, { status: 415 });
+
+  try {
+    const bytes = match[2]
+      ? Uint8Array.from(atob(match[3]), (character) => character.charCodeAt(0))
+      : new TextEncoder().encode(decodeURIComponent(match[3]));
+    return new Response(bytes, {
+      headers: {
+        'Content-Type': match[1],
+        'Cache-Control': 'public, max-age=3600, must-revalidate',
+      },
+    });
+  } catch {
+    return Response.json({ error: 'No se pudo leer la foto' }, { status: 500 });
+  }
+}
+
 function validAnimal(value: unknown): value is AnimalRecord {
   if (!value || typeof value !== 'object') return false;
   const animal = value as Partial<AnimalRecord>;
@@ -65,9 +101,25 @@ export default async (request: Request, _context: Context): Promise<Response> =>
   if (request.method === 'GET') {
     if (resource === 'settings') return Response.json({ settings: ((await store().get(settingsKey, { type: 'json' })) as typeof defaultSettings | null) ?? defaultSettings });
     const animals = await readAnimals();
-    const trash = new URL(request.url).searchParams.get('trash') === 'true';
+    const url = new URL(request.url);
+    const trash = url.searchParams.get('trash') === 'true';
     if (trash && !(await isAuthenticated(request))) return Response.json({ error: 'Sesión de administración no válida' }, { status: 401 });
-    return Response.json({ animals: animals.filter((animal) => trash ? Boolean(animal.deletedAt) : !animal.deletedAt) }, { headers: { 'Cache-Control': 'no-store' } });
+    const activeAnimals = animals.filter((animal) => trash ? Boolean(animal.deletedAt) : !animal.deletedAt);
+    const id = url.searchParams.get('id');
+    if (id && !trash) {
+      const animal = activeAnimals.find((item) => item.id === id);
+      if (!animal) return Response.json({ error: 'Animal no encontrado' }, { status: 404 });
+      const photoIndex = url.searchParams.get('photo');
+      if (photoIndex !== null) return photoResponse(animal.photos[Number(photoIndex)]);
+      return Response.json({ animal: publicAnimal(animal) }, { headers: { 'Cache-Control': 'public, max-age=60, must-revalidate' } });
+    }
+    if (url.searchParams.get('view') === 'catalog') {
+      return Response.json(
+        { animals: activeAnimals.map(catalogAnimal) },
+        { headers: { 'Cache-Control': 'public, max-age=60, must-revalidate' } },
+      );
+    }
+    return Response.json({ animals: activeAnimals }, { headers: { 'Cache-Control': 'no-store' } });
   }
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
     return new Response('Método no permitido', { status: 405, headers: { Allow: 'GET, POST, PUT, PATCH, DELETE' } });

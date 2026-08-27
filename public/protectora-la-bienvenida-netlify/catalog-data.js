@@ -9,9 +9,8 @@
     })[character]);
 
   try {
-    const response = await fetch('/.netlify/functions/animals', {
+    const response = await fetch('/.netlify/functions/animals?view=catalog', {
       headers: { Accept: 'application/json' },
-      cache: 'no-store',
     });
     if (!response.ok) throw new Error();
     const { animals } = await response.json();
@@ -28,7 +27,7 @@
       <article class="animal-card visible" data-type="${escapeHtml(animal.species.toLowerCase())}"
         tabindex="0" role="link" data-animal-id="${encodeURIComponent(animal.id)}">
         <div class="photo catalog-photo" data-photos="${escapeHtml(JSON.stringify(photos))}" data-current-photo="0">
-          <img src="${escapeHtml(photos[0])}" alt="${escapeHtml(animal.name)} — foto 1 de ${photos.length}">
+          <img src="${escapeHtml(photos[0])}" alt="${escapeHtml(animal.name)} — foto 1 de ${photos.length}" loading="lazy" decoding="async">
           ${animal.urgent ? '<span class="urgent">Urgente</span>' : animal.status !== 'available' ? `<span>${escapeHtml(statusLabel(animal.status))}</span>` : ''}
           ${photoButtons}
         </div>
