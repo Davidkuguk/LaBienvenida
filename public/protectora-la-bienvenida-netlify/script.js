@@ -62,9 +62,7 @@ amounts.forEach((button) =>
     amounts.forEach((b) => b.classList.remove('selected'));
     button.classList.add('selected');
     const amount = button.textContent.trim();
-    donateButton.textContent =
-      amount === 'Otra' ? 'Quiero hacer una donación' : `Quiero ayudar con ${amount}`;
-    donateButton.href = `mailto:petercanespejos@gmail.com?subject=${encodeURIComponent(amount === 'Otra' ? 'Quiero hacer una donación' : `Quiero donar ${amount}`)}`;
+    donateButton.textContent = amount === 'Otra' ? 'Donar con PayPal' : `Donar ${amount} con PayPal`;
   }),
 );
 const observer = new IntersectionObserver(

@@ -4,6 +4,8 @@ import { initialAnimals, type AnimalRecord } from '../lib/animals';
 
 const store = () => getStore({ name: 'shelter-data', consistency: 'strong' });
 const key = 'animals';
+const settingsKey = 'shelter-settings';
+const defaultSettings = { name: 'La Bienvenida', email: 'petercanespejos@gmail.com', phone: '', address: '', hours: '', instagram: '', facebook: '' };
 const cookieName = 'la_bienvenida_admin';
 const encoder = new TextEncoder();
 
@@ -59,7 +61,9 @@ function validAnimal(value: unknown): value is AnimalRecord {
 }
 
 export default async (request: Request, _context: Context): Promise<Response> => {
+  const resource = new URL(request.url).searchParams.get('resource');
   if (request.method === 'GET') {
+    if (resource === 'settings') return Response.json({ settings: ((await store().get(settingsKey, { type: 'json' })) as typeof defaultSettings | null) ?? defaultSettings });
     const animals = await readAnimals();
     const trash = new URL(request.url).searchParams.get('trash') === 'true';
     if (trash && !(await isAuthenticated(request))) return Response.json({ error: 'Sesión de administración no válida' }, { status: 401 });
@@ -79,6 +83,14 @@ export default async (request: Request, _context: Context): Promise<Response> =>
     const updated = animals.map((animal) => animal.id === id ? { ...animal, deletedAt: undefined } : animal);
     await store().setJSON(key, updated);
     return Response.json({ animals: updated.filter((animal) => !animal.deletedAt) });
+  }
+
+  if (resource === 'settings' && request.method === 'PUT') {
+    const input = await request.json().catch(() => null) as Partial<typeof defaultSettings> | null;
+    if (!input?.name?.trim() || !input.email?.trim()) return Response.json({ error: 'Nombre y correo son obligatorios.' }, { status: 400 });
+    const settings = { ...defaultSettings, ...input, name: input.name.trim(), email: input.email.trim() };
+    await store().setJSON(settingsKey, settings);
+    return Response.json({ settings });
   }
   if (request.method === 'DELETE') {
     const id = new URL(request.url).searchParams.get('id');

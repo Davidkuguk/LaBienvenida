@@ -39,6 +39,8 @@
       <button type="button" [class.active]="activeSection() === 'new'" (click)="showSection('new')">Nueva ficha</button>
       <button type="button" [class.active]="activeSection() === 'inventory'" (click)="showSection('inventory')">Inventario</button>
       <button type="button" [class.active]="activeSection() === 'requests'" (click)="showSection('requests')">Solicitudes</button>
+      <button type="button" [class.active]="activeSection() === 'fosters'" (click)="showSection('fosters')">Acogidas</button>
+      <button type="button" [class.active]="activeSection() === 'settings'" (click)="showSection('settings')">Ajustes</button>
       <a href="#fosters">Acogidas</a>
       <a href="#settings">Ajustes</a>
       <a href="/" target="_blank" rel="noopener">
@@ -380,6 +382,22 @@
           </div>
         }
       </section>
+
+      <section class="panel requests-panel" [hidden]="activeSection() !== 'fosters'" aria-labelledby="fosters-title">
+        <div class="panel-heading"><div><p class="eyebrow">Seguimiento privado</p><h2 id="fosters-title">Acogidas</h2></div></div>
+        <form novalidate (ngSubmit)="saveFoster()">
+          <label>Animal<select required [ngModel]="fosterForm().animalId" name="fosterAnimal" (ngModelChange)="updateFoster('animalId', $event)"><option value="">Selecciona un animal</option>@for (animal of animals(); track animal.id) { <option [value]="animal.id">{{ animal.name }}</option> }</select></label>
+          <div class="field-row"><label>Persona acogedora<input required name="carerName" [ngModel]="fosterForm().carerName" (ngModelChange)="updateFoster('carerName', $event)" /></label><label>Teléfono<input required name="fosterPhone" [ngModel]="fosterForm().phone" (ngModelChange)="updateFoster('phone', $event)" /></label></div>
+          <label>Dirección<input required name="fosterAddress" [ngModel]="fosterForm().address" (ngModelChange)="updateFoster('address', $event)" /></label>
+          <div class="field-row"><label>Correo electrónico<input type="email" name="fosterEmail" [ngModel]="fosterForm().email" (ngModelChange)="updateFoster('email', $event)" /></label><label>Estado<select name="fosterStatus" [ngModel]="fosterForm().status" (ngModelChange)="updateFoster('status', $event)"><option value="pending">Pendiente</option><option value="active">Activa</option><option value="finished">Finalizada</option></select></label></div>
+          <div class="field-row"><label>Inicio<input type="date" name="fosterStart" [ngModel]="fosterForm().startDate" (ngModelChange)="updateFoster('startDate', $event)" /></label><label>Fin<input type="date" name="fosterEnd" [ngModel]="fosterForm().endDate" (ngModelChange)="updateFoster('endDate', $event)" /></label></div>
+          <label>Observaciones<textarea rows="3" name="fosterNotes" [ngModel]="fosterForm().notes" (ngModelChange)="updateFoster('notes', $event)"></textarea></label>
+          <button class="submit-button" type="submit">Guardar acogida</button>
+        </form>
+        <div class="request-list">@for (foster of fosters(); track foster.id) { <article class="request-card"><div><strong>{{ foster.animalName }}</strong><span>{{ foster.carerName }} · {{ foster.status }}</span></div><p>{{ foster.phone }} · {{ foster.address }}</p></article> } @empty { <p class="requests-empty">No hay acogidas registradas.</p> }</div>
+      </section>
+
+      <section class="panel form-panel" [hidden]="activeSection() !== 'settings'"><div class="panel-heading"><div><p class="eyebrow">Datos públicos</p><h2>Ajustes de la protectora</h2></div></div><form (ngSubmit)="saveSettings()"><label>Nombre<input name="settingName" [ngModel]="settings().name" (ngModelChange)="updateSettings('name', $event)" /></label><div class="field-row"><label>Correo<input type="email" name="settingEmail" [ngModel]="settings().email" (ngModelChange)="updateSettings('email', $event)" /></label><label>Teléfono<input name="settingPhone" [ngModel]="settings().phone" (ngModelChange)="updateSettings('phone', $event)" /></label></div><label>Dirección<input name="settingAddress" [ngModel]="settings().address" (ngModelChange)="updateSettings('address', $event)" /></label><label>Horarios<textarea name="settingHours" rows="2" [ngModel]="settings().hours" (ngModelChange)="updateSettings('hours', $event)"></textarea></label><div class="field-row"><label>Instagram<input name="settingInstagram" [ngModel]="settings().instagram" (ngModelChange)="updateSettings('instagram', $event)" /></label><label>Facebook<input name="settingFacebook" [ngModel]="settings().facebook" (ngModelChange)="updateSettings('facebook', $event)" /></label></div><button class="submit-button" type="submit">Guardar datos públicos</button></form></section>
 
       <section class="panel list-panel" [hidden]="activeSection() !== 'inventory'" id="inventory" aria-labelledby="animal-list-title">
         <div class="panel-heading list-heading">
