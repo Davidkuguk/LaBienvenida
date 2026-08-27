@@ -185,6 +185,7 @@ export class Dashboard implements OnInit {
   protected readonly visitorCountUnavailable = signal(false);
   protected readonly requests = signal<AdoptionRequest[]>([]);
   protected readonly requestsLoading = signal(true);
+  protected readonly requestAnimalFilter = signal('all');
 
   protected readonly filteredAnimals = computed(() => {
     const status = this.statusFilter();
@@ -212,6 +213,11 @@ export class Dashboard implements OnInit {
       const difference = new Date(right.arrivalDate).getTime() - new Date(left.arrivalDate).getTime();
       return this.sortBy() === 'recent' ? difference : -difference;
     });
+  });
+
+  protected readonly filteredRequests = computed(() => {
+    const animalId = this.requestAnimalFilter();
+    return this.requests().filter((request) => animalId === 'all' || request.animalId === animalId);
   });
 
   protected readonly availableCount = computed(
@@ -269,6 +275,10 @@ export class Dashboard implements OnInit {
 
   protected requestStatusLabel(status: RequestStatus): string {
     return { new: 'Nueva', contacted: 'Contactada', visit: 'Visita', approved: 'Aprobada', closed: 'Cerrada' }[status];
+  }
+
+  protected requestDate(createdAt: string): string {
+    return new Date(createdAt).toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
   }
 
   private async loadAnimals(): Promise<void> {

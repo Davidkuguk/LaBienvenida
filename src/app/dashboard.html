@@ -359,6 +359,12 @@
       <section class="panel requests-panel" [hidden]="activeSection() !== 'requests'" id="requests" aria-labelledby="requests-title">
         <div class="panel-heading">
           <div><p class="eyebrow">Adopciones</p><h2 id="requests-title">Solicitudes recibidas</h2></div>
+          <label class="request-filter">Animal
+            <select [ngModel]="requestAnimalFilter()" (ngModelChange)="requestAnimalFilter.set($event)" aria-label="Filtrar solicitudes por animal">
+              <option value="all">Todos los animales</option>
+              @for (animal of animals(); track animal.id) { <option [value]="animal.id">{{ animal.name }}</option> }
+            </select>
+          </label>
         </div>
         @if (requestsLoading()) {
           <p class="requests-empty">Cargando solicitudes…</p>
@@ -366,15 +372,17 @@
           <p class="requests-empty">Aún no hay solicitudes de adopción.</p>
         } @else {
           <div class="request-list">
-            @for (request of requests(); track request.id) {
+            @for (request of filteredRequests(); track request.id) {
               <article class="request-card">
                 <div><strong>{{ request.name }}</strong><span>{{ request.animalName }} · {{ requestStatusLabel(request.status) }}</span></div>
-                <p>{{ request.message }}</p>
+                <p>{{ request.message }}<br /><small>Última solicitud: {{ requestDate(request.createdAt) }}</small></p>
                 <a [href]="'mailto:' + request.email">{{ request.email }}</a><a [href]="'tel:' + request.phone">{{ request.phone }}</a>
                 <select [ngModel]="request.status" (ngModelChange)="updateRequestStatus(request, $event)" aria-label="Estado de la solicitud">
                   <option value="new">Nueva</option><option value="contacted">Contactada</option><option value="visit">Visita</option><option value="approved">Aprobada</option><option value="closed">Cerrada</option>
                 </select>
               </article>
+            } @empty {
+              <p class="requests-empty">No hay solicitudes para este animal.</p>
             }
           </div>
         }

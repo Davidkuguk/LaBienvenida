@@ -32,9 +32,18 @@ export default async (request: Request, _context: Context): Promise<Response> =>
     if (!body?.animalId?.trim() || !body.animalName?.trim() || !body.name?.trim() || !body.email?.trim() || !body.phone?.trim() || !body.message?.trim()) return json({ error: 'Completa todos los campos.' }, 400);
     if (!/^\S+@\S+\.\S+$/.test(body.email.trim())) return json({ error: 'Introduce un correo válido.' }, 400);
     const requests = await read();
-    const item: AdoptionRequest = { id: crypto.randomUUID(), animalId: body.animalId.trim(), animalName: body.animalName.trim(), name: body.name.trim(), email: body.email.trim(), phone: body.phone.trim(), message: body.message.trim(), status: 'new', createdAt: new Date().toISOString() };
-    await store().setJSON(key, [item, ...requests]);
-    return json({ request: item }, 201);
+    const animalId = body.animalId.trim();
+    const email = body.email.trim().toLocaleLowerCase();
+    const now = new Date().toISOString();
+    const matching = requests.filter((item) => item.animalId === animalId && item.email.trim().toLocaleLowerCase() === email);
+    const existing = matching.sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())[0];
+    const item: AdoptionRequest = existing
+      ? { ...existing, animalName: body.animalName.trim(), name: body.name.trim(), email, phone: body.phone.trim(), message: body.message.trim(), createdAt: now }
+      : { id: crypto.randomUUID(), animalId, animalName: body.animalName.trim(), name: body.name.trim(), email, phone: body.phone.trim(), message: body.message.trim(), status: 'new', createdAt: now };
+    // También limpia posibles duplicados antiguos del mismo correo para este animal.
+    const updated = [item, ...requests.filter((candidate) => !matching.includes(candidate))];
+    await store().setJSON(key, updated);
+    return json({ request: item, updated: Boolean(existing) }, existing ? 200 : 201);
   }
   if (!(await authenticated(request))) return json({ error: 'Sesión de administración no válida' }, 401);
   const requests = await read();

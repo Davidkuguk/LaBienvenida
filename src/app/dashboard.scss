@@ -562,6 +562,9 @@ textarea:focus {
 .request-card strong, .request-card span { display: block; }
 .request-card p { grid-column: 1 / -1; }
 .request-card a { color: var(--green); font-weight: 700; }
+.request-card small { color: #60705f; }
+.request-filter { display: grid; gap: 5px; min-width: 180px; color: #60705f; font-size: 12px; font-weight: 700; }
+.request-filter select { min-width: 180px; }
 .foster-open { padding: 0; border: 0; color: var(--ink); background: transparent; text-align: left; }
 .foster-open strong, .foster-open span { display: block; }
 .foster-open span { margin-top: 4px; color: #60705f; }
