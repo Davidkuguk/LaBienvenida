@@ -17,6 +17,9 @@
     const orderedAnimals = [...animals].sort((left, right) => Number(Boolean(right.urgent)) - Number(Boolean(left.urgent)));
     grid.innerHTML = orderedAnimals.map((animal) => {
       const photos = Array.isArray(animal.photos) && animal.photos.length ? animal.photos : [''];
+      const focusX = clampFocus(animal.photoFocusX);
+      const focusY = clampFocus(animal.photoFocusY);
+      const age = currentAge(animal.age, animal.arrivalDate);
       const photoButtons = photos.length > 1 ? `
             <button class="catalog-gallery-arrow catalog-gallery-prev" type="button" aria-label="Ver foto anterior de ${escapeHtml(animal.name)}">‹</button>
             <button class="catalog-gallery-arrow catalog-gallery-next" type="button" aria-label="Ver foto siguiente de ${escapeHtml(animal.name)}">›</button>
@@ -26,14 +29,14 @@
       return `
       <article class="animal-card visible" data-type="${escapeHtml(animal.species.toLowerCase())}"
         tabindex="0" role="link" data-animal-id="${encodeURIComponent(animal.id)}">
-        <div class="photo catalog-photo" data-photos="${escapeHtml(JSON.stringify(photos))}" data-current-photo="0">
-          <img src="${escapeHtml(photos[0])}" alt="${escapeHtml(animal.name)} — foto 1 de ${photos.length}" loading="lazy" decoding="async">
+        <div class="photo catalog-photo" data-photos="${escapeHtml(JSON.stringify(photos))}" data-current-photo="0" data-focus-x="${focusX}" data-focus-y="${focusY}">
+          <img src="${escapeHtml(photos[0])}" alt="${escapeHtml(animal.name)} — foto 1 de ${photos.length}" loading="lazy" decoding="async" style="object-position:${focusX}% ${focusY}%">
           ${animal.urgent ? '<span class="urgent">Urgente</span>' : animal.status !== 'available' ? `<span>${escapeHtml(statusLabel(animal.status))}</span>` : ''}
           ${photoButtons}
         </div>
         <div class="animal-info">
           <div><h3>${escapeHtml(animal.name)}</h3>
-          <p class="animal-tags"><span>${animal.age} ${animal.age === 1 ? 'año' : 'años'}</span><span>${escapeHtml(animal.sex)}</span><span>${escapeHtml(animal.size)}</span></p></div>
+          <p class="animal-tags"><span>${age} ${age === 1 ? 'año' : 'años'}</span><span>${escapeHtml(animal.sex)}</span><span>${escapeHtml(animal.size)}</span></p></div>
           <button class="circle-button" type="button" aria-label="Ver a ${escapeHtml(animal.name)}">↗</button>
         </div>
       </article>`;
@@ -66,7 +69,21 @@
   }
 
   function statusLabel(status) {
-    return { reserved: 'Reservado', adopted: 'Adoptado', medical: 'En cuidados' }[status] || 'Disponible';
+    return { reserved: 'Reservado', adopted: 'Adoptado', medical: 'En cuidados médicos' }[status] || 'Disponible';
+  }
+
+  function clampFocus(value) {
+    const number = Number(value);
+    return Number.isFinite(number) ? Math.min(100, Math.max(0, number)) : 50;
+  }
+
+  function currentAge(ageAtArrival, arrivalDate) {
+    const arrival = new Date(`${arrivalDate}T00:00:00`);
+    if (!arrivalDate || Number.isNaN(arrival.getTime())) return ageAtArrival;
+    const today = new Date();
+    let years = today.getFullYear() - arrival.getFullYear();
+    if (today.getMonth() < arrival.getMonth() || (today.getMonth() === arrival.getMonth() && today.getDate() < arrival.getDate())) years--;
+    return ageAtArrival + Math.max(0, years);
   }
 
   function setupQuickGallery(gallery) {
@@ -82,6 +99,7 @@
       const index = (nextIndex + photos.length) % photos.length;
       gallery.dataset.currentPhoto = String(index);
       image.src = photos[index];
+      image.style.objectPosition = index === 0 ? `${gallery.dataset.focusX}% ${gallery.dataset.focusY}%` : '50% 50%';
       image.alt = `${image.alt.split(' — ')[0]} — foto ${index + 1} de ${photos.length}`;
       dots.forEach((dot, dotIndex) => {
         const active = dotIndex === index;

@@ -4,6 +4,8 @@ export interface AnimalRecord {
   id: string;
   name: string;
   photos: string[];
+  photoFocusX?: number;
+  photoFocusY?: number;
   species: string;
   breed: string;
   age: number;
@@ -62,6 +64,8 @@ export const initialAnimals: AnimalRecord[] = basics.map((animal, index) => ({
   description: animal[8],
   exercise: animal[9],
   photos: [images[index]],
+  photoFocusX: 50,
+  photoFocusY: 50,
   status: 'available',
   urgent: false,
   arrivalDate: '2026-01-01',

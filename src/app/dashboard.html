@@ -109,7 +109,7 @@
           }
           <div class="form-section-title">
             <span>01</span>
-            <div><strong>Datos principales y hogar ideal</strong><small>Información esencial para registrar y presentar al animal</small></div>
+            <div><strong>Datos principales y compatibilidad</strong><small>Información esencial para registrar al animal</small></div>
           </div>
 
           <label>
@@ -130,8 +130,6 @@
               <select name="species" [ngModel]="form().species" (ngModelChange)="updateForm('species', $event)">
                 <option>Perro</option>
                 <option>Gato</option>
-                <option>Conejo</option>
-                <option>Ave</option>
                 <option>Otro</option>
               </select>
             </label>
@@ -150,7 +148,7 @@
 
           <div class="field-row three">
             <label>
-              Edad
+              Edad al entrar
               <input
                 name="age"
                 required
@@ -185,7 +183,7 @@
                 <option value="available">Disponible para adoptar</option>
                 <option value="reserved">Reservado</option>
                 <option value="adopted">Adoptado</option>
-                <option value="medical">En cuidados medicos</option>
+                <option value="medical">En cuidados médicos</option>
               </select>
             </label>
             <label class="urgent-field">
@@ -200,6 +198,7 @@
                 [ngModel]="form().arrivalDate"
                 (ngModelChange)="updateForm('arrivalDate', $event)"
               />
+              <small class="current-age-note">Edad actual: {{ formCurrentAge() }}</small>
             </label>
           </div>
 
@@ -213,32 +212,13 @@
             />
           </label>
 
-          <label>
-            Su hogar ideal
-            <textarea
-              name="idealHome"
-              rows="3"
-              [ngModel]="form().idealHome"
-              (ngModelChange)="updateForm('idealHome', $event)"
-              placeholder="Ej. Un hogar tranquilo con rutinas estables..."
-            ></textarea>
-          </label>
-
           <div class="field-row compatibility-fields">
             <label>
-              Con adultos
+              Con personas
               <input
                 name="compatibleAdults"
                 [ngModel]="form().compatibleAdults"
                 (ngModelChange)="updateForm('compatibleAdults', $event)"
-              />
-            </label>
-            <label>
-              Con niños
-              <input
-                name="compatibleChildren"
-                [ngModel]="form().compatibleChildren"
-                (ngModelChange)="updateForm('compatibleChildren', $event)"
               />
             </label>
             <label>
@@ -265,22 +245,11 @@
           </div>
 
           <label>
-            Frase de presentación
-            <textarea
-              name="description"
-              required
-              [class.input-invalid]="showValidation() && !form().description.trim()"
-              rows="2"
-              [ngModel]="form().description"
-              (ngModelChange)="updateForm('description', $event)"
-              placeholder="Una frase breve que presente su carácter..."
-            ></textarea>
-          </label>
-
-          <label>
             Su historia
             <textarea
               name="notes"
+              required
+              [class.input-invalid]="showValidation() && !form().notes.trim()"
               rows="5"
               [ngModel]="form().notes"
               (ngModelChange)="updateForm('notes', $event)"
@@ -334,13 +303,28 @@
           <div class="photo-field">
             <label for="animal-photos">Fotos de la mascota</label>
             <input id="animal-photos" type="file" accept="image/*" multiple (change)="addPhotos($event)" />
-            <span>La primera foto será la principal. Las imágenes se optimizan automáticamente antes de guardarse.</span>
+            <span>La primera foto será la principal. Máximo 15 MB por archivo; se reduce automáticamente a 1280 px y formato WebP.</span>
 
             @if (form().photos.length) {
+              <div class="photo-focus-editor">
+                <div class="focus-preview">
+                  <img [src]="form().photos[0]" [style.object-position]="form().photoFocusX + '% ' + form().photoFocusY + '%'" alt="Vista previa del encuadre principal" />
+                </div>
+                <div class="focus-controls">
+                  <strong>Centrar foto principal</strong>
+                  <label>Horizontal
+                    <input type="range" min="0" max="100" name="photoFocusX" [ngModel]="form().photoFocusX" (ngModelChange)="updateForm('photoFocusX', +$event)" />
+                  </label>
+                  <label>Vertical
+                    <input type="range" min="0" max="100" name="photoFocusY" [ngModel]="form().photoFocusY" (ngModelChange)="updateForm('photoFocusY', +$event)" />
+                  </label>
+                  <small>Mueve los controles hasta que la cara quede bien encuadrada.</small>
+                </div>
+              </div>
               <div class="photo-preview-grid" aria-label="Fotos seleccionadas">
                 @for (photo of form().photos; track photo; let index = $index) {
                   <figure>
-                    <img [src]="photo" alt="Foto seleccionada de la mascota" />
+                    <img [src]="photo" [style.object-position]="index === 0 ? form().photoFocusX + '% ' + form().photoFocusY + '%' : '50% 50%'" alt="Foto seleccionada de la mascota" />
                     @if (index === 0) { <figcaption>Foto principal</figcaption> }
                     <div class="photo-actions">
                       @if (index > 0) { <button type="button" (click)="makePrimaryPhoto(index)">Principal</button> }
@@ -430,10 +414,10 @@
               <option value="available">Disponibles</option>
               <option value="reserved">Reservados</option>
               <option value="adopted">Adoptados</option>
-              <option value="medical">En cuidados</option>
+              <option value="medical">En cuidados médicos</option>
             </select>
             <select [ngModel]="speciesFilter()" (ngModelChange)="speciesFilter.set($event)" aria-label="Filtrar por especie">
-              <option value="all">Todas las especies</option><option>Perro</option><option>Gato</option><option>Conejo</option><option>Ave</option><option>Otro</option>
+              <option value="all">Todas las especies</option><option>Perro</option><option>Gato</option><option>Otro</option>
             </select>
             <select [ngModel]="sexFilter()" (ngModelChange)="sexFilter.set($event)" aria-label="Filtrar por sexo">
               <option value="all">Todos los sexos</option><option>Hembra</option><option>Macho</option>
@@ -458,80 +442,37 @@
         }
 
         @if (filteredAnimals().length) {
-          <div class="animal-list">
-            @for (animal of filteredAnimals(); track animal.id) {
-              <article class="animal-card">
-                <div class="animal-avatar" aria-hidden="true">{{ animal.name.charAt(0) }}</div>
-                <div class="animal-main">
-                  <div class="animal-title">
-                    <div>
-                      <h3>{{ animal.name }}</h3>
-                      <p>{{ animal.species }} · {{ animal.breed }} · {{ animal.age }} anos</p>
-                    </div>
-                    <div class="animal-labels">
-                      @if (animal.urgent) { <span class="status-pill urgent">Urgente</span> }
-                      <span class="status-pill" [class]="animal.status">{{ statusLabel(animal.status) }}</span>
-                    </div>
-                  </div>
-
-                  <p class="description">{{ animal.description }}</p>
-
-                  @if (animal.photos.length) {
-                    <div class="animal-gallery" aria-label="Fotos de {{ animal.name }}">
-                      @for (photo of animal.photos; track photo; let index = $index) {
-                        <img [src]="photo" alt="Foto {{ index + 1 }} de {{ animal.name }}" />
-                      }
-                    </div>
+          <div class="animal-table-wrap">
+            <table class="animal-table">
+              <thead><tr><th>Foto</th><th>Animal</th><th>Datos</th><th>Edad y entrada</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody>
+                @for (animal of filteredAnimals(); track animal.id) {
+                  <tr>
+                    <td>
+                      @if (animal.photos.length) {
+                        <img class="table-animal-photo" [src]="animal.photos[0]" [style.object-position]="(animal.photoFocusX ?? 50) + '% ' + (animal.photoFocusY ?? 50) + '%'" alt="Foto de {{ animal.name }}" />
+                      } @else { <span class="table-animal-placeholder" aria-hidden="true">{{ animal.name.charAt(0) }}</span> }
+                    </td>
+                    <td><strong>{{ animal.name }}</strong><small>{{ animal.breed }}</small></td>
+                    <td>{{ animal.species }} · {{ animal.sex }}<small>{{ animal.size }} · {{ animal.weight || 'Sin peso' }}</small></td>
+                    <td><strong>{{ currentAge(animal.age, animal.arrivalDate) }} años</strong><small>Entró: {{ animal.arrivalDate }}</small></td>
+                    <td><div class="animal-labels">@if (animal.urgent) { <span class="status-pill urgent">Urgente</span> }<span class="status-pill" [class]="animal.status">{{ statusLabel(animal.status) }}</span></div></td>
+                    <td><div class="table-actions"><button type="button" (click)="toggleAnimalDetails(animal.id)">{{ expandedAnimalId() === animal.id ? 'Cerrar' : 'Ver ficha' }}</button><button type="button" (click)="openPublicAnimal(animal)">Ver en web</button><button type="button" (click)="editAnimal(animal)">Editar</button><button class="danger" type="button" (click)="removeAnimal(animal.id)">Eliminar</button></div></td>
+                  </tr>
+                  @if (expandedAnimalId() === animal.id) {
+                    <tr class="animal-detail-row"><td colspan="6">
+                      <div class="table-detail-grid">
+                        <section><span>Historia y presentación</span><p>{{ animal.notes || animal.description }}</p></section>
+                        <section><span>Salud</span><strong>{{ animal.medicalStatus }}</strong><p>{{ animal.medicalDetail || 'Sin detalle veterinario' }}</p></section>
+                        <section><span>Actividad</span><strong>{{ exerciseLabel(animal.exercise) }}</strong></section>
+                        <section><span>Compatibilidad</span><p>Personas: <b>{{ animal.compatibleAdults }}</b> · Perros: <b>{{ animal.compatibleDogs }}</b> · Gatos: <b>{{ animal.compatibleCats }}</b></p></section>
+                      </div>
+                      @if (animal.photos.length > 1) { <div class="table-gallery">@for (photo of animal.photos; track photo; let index = $index) { <img [src]="photo" alt="Foto {{ index + 1 }} de {{ animal.name }}" /> }</div> }
+                    </td></tr>
                   }
-
-                  <dl class="animal-details">
-                    <div>
-                      <dt>Sexo</dt>
-                      <dd>{{ animal.sex }}</dd>
-                    </div>
-                    <div>
-                      <dt>Tamaño y peso</dt>
-                      <dd>{{ animal.size }} · {{ animal.weight || 'Sin indicar' }}</dd>
-                    </div>
-                    <div>
-                      <dt>Entrada</dt>
-                      <dd>{{ animal.arrivalDate }}</dd>
-                    </div>
-                    <div>
-                      <dt>Ejercicio</dt>
-                      <dd>{{ exerciseLabel(animal.exercise) }}</dd>
-                    </div>
-                  </dl>
-
-                  <div class="animal-public-data">
-                    <div>
-                      <span>Estado veterinario</span>
-                      <strong>{{ animal.medicalStatus }}</strong>
-                      @if (animal.medicalDetail) {
-                        <small>{{ animal.medicalDetail }}</small>
-                      }
-                    </div>
-                    <div>
-                      <span>Hogar ideal</span>
-                      <strong>{{ animal.idealHome || 'Pendiente de definir' }}</strong>
-                    </div>
-                  </div>
-
-                  <div class="compatibility-summary" aria-label="Compatibilidades de {{ animal.name }}">
-                    <span>Adultos: <b>{{ animal.compatibleAdults }}</b></span>
-                    <span>Niños: <b>{{ animal.compatibleChildren }}</b></span>
-                    <span>Perros: <b>{{ animal.compatibleDogs }}</b></span>
-                    <span>Gatos: <b>{{ animal.compatibleCats }}</b></span>
-                  </div>
-
-                  <div class="card-actions">
-                    <button type="button" (click)="openPublicAnimal(animal)">Ver en la web</button>
-                    <button type="button" (click)="editAnimal(animal)">Editar</button>
-                    <button class="danger" type="button" (click)="removeAnimal(animal.id)">Eliminar</button>
-                  </div>
-                </div>
-              </article>
-            }
+                }
+              </tbody>
+            </table>
           </div>
         } @else {
           <div class="empty-state">

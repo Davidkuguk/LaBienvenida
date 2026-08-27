@@ -57,8 +57,8 @@ function publicAnimal(animal: AnimalRecord): AnimalRecord {
 }
 
 function catalogAnimal(animal: AnimalRecord) {
-  const { id, name, species, age, sex, size, status, urgent } = animal;
-  return { id, name, species, age, sex, size, status, urgent, photos: publicAnimal(animal).photos };
+  const { id, name, species, age, sex, size, status, urgent, arrivalDate, photoFocusX, photoFocusY } = animal;
+  return { id, name, species, age, sex, size, status, urgent, arrivalDate, photoFocusX, photoFocusY, photos: publicAnimal(animal).photos };
 }
 
 function photoResponse(photo: string | undefined): Response {

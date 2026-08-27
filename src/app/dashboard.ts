@@ -12,6 +12,8 @@ interface ShelterAnimal {
   id: string;
   name: string;
   photos: string[];
+  photoFocusX?: number;
+  photoFocusY?: number;
   species: string;
   breed: string;
   age: number;
@@ -36,6 +38,8 @@ interface ShelterAnimal {
 interface AnimalForm {
   name: string;
   photos: string[];
+  photoFocusX: number;
+  photoFocusY: number;
   species: string;
   breed: string;
   age: number | null;
@@ -60,6 +64,8 @@ interface AnimalForm {
 const initialForm: AnimalForm = {
   name: '',
   photos: [],
+  photoFocusX: 50,
+  photoFocusY: 50,
   species: 'Perro',
   breed: '',
   age: null,
@@ -170,6 +176,7 @@ export class Dashboard implements OnInit {
 
   protected readonly form = signal<AnimalForm>({ ...initialForm });
   protected readonly editingId = signal<string | null>(null);
+  protected readonly expandedAnimalId = signal<string | null>(null);
   protected readonly animalsLoading = signal(true);
   protected readonly saveError = signal('');
   protected readonly saving = signal(false);
@@ -204,7 +211,7 @@ export class Dashboard implements OnInit {
       const matchesArrival = this.arrivalFilter() === 'all' || (this.arrivalFilter() === 'older' ? arrival < Date.now() - 90 * 24 * 60 * 60 * 1000 : arrival >= threshold);
       const matchesSearch =
         !search ||
-        [animal.name, animal.species, animal.breed, animal.exercise, animal.idealHome]
+        [animal.name, animal.species, animal.breed, animal.exercise, animal.notes, animal.medicalStatus]
           .join(' ')
           .toLowerCase()
           .includes(search);
@@ -344,13 +351,13 @@ export class Dashboard implements OnInit {
   protected async saveAnimal(): Promise<void> {
     const form = this.form();
 
-    if (!form.name.trim() || !form.breed.trim() || !form.description.trim() || form.age === null) {
+    if (!form.name.trim() || !form.breed.trim() || !form.notes.trim() || form.age === null) {
       this.showValidation.set(true);
       const missing = [
         !form.name.trim() && 'nombre',
         !form.breed.trim() && 'raza',
         form.age === null && 'edad',
-        !form.description.trim() && 'frase de presentación',
+        !form.notes.trim() && 'historia',
       ].filter(Boolean);
       this.saveError.set(`Completa los campos obligatorios: ${missing.join(', ')}.`);
       return;
@@ -360,7 +367,9 @@ export class Dashboard implements OnInit {
       id: this.editingId() ?? this.createId(form.name),
       name: form.name.trim(),
       photos: form.photos,
-      species: form.species.trim(),
+      photoFocusX: form.photoFocusX,
+      photoFocusY: form.photoFocusY,
+      species: ['Perro', 'Gato'].includes(form.species) ? form.species : 'Otro',
       breed: form.breed.trim(),
       age: form.age,
       sex: form.sex,
@@ -369,7 +378,7 @@ export class Dashboard implements OnInit {
       status: form.status,
       urgent: form.urgent,
       arrivalDate: form.arrivalDate,
-      description: form.description.trim(),
+      description: this.storySummary(form.notes),
       notes: form.notes.trim(),
       exercise: this.exerciseLabel(form.exercise),
       idealHome: form.idealHome.trim(),
@@ -411,7 +420,9 @@ export class Dashboard implements OnInit {
     this.form.set({
       name: animal.name,
       photos: animal.photos,
-      species: animal.species,
+      photoFocusX: animal.photoFocusX ?? 50,
+      photoFocusY: animal.photoFocusY ?? 50,
+      species: ['Perro', 'Gato'].includes(animal.species) ? animal.species : 'Otro',
       breed: animal.breed,
       age: animal.age,
       sex: animal.sex,
@@ -435,6 +446,35 @@ export class Dashboard implements OnInit {
 
   protected openPublicAnimal(animal: ShelterAnimal): void {
     window.open(`/animal?id=${encodeURIComponent(animal.id)}`, '_blank', 'noopener');
+  }
+
+  protected toggleAnimalDetails(id: string): void {
+    this.expandedAnimalId.update((current) => current === id ? null : id);
+  }
+
+  protected currentAge(ageAtArrival: number, arrivalDate: string): number {
+    const arrival = new Date(`${arrivalDate}T00:00:00`);
+    if (!arrivalDate || Number.isNaN(arrival.getTime())) return ageAtArrival;
+    const today = new Date();
+    let years = today.getFullYear() - arrival.getFullYear();
+    const anniversaryPending =
+      today.getMonth() < arrival.getMonth() ||
+      (today.getMonth() === arrival.getMonth() && today.getDate() < arrival.getDate());
+    if (anniversaryPending) years -= 1;
+    return ageAtArrival + Math.max(0, years);
+  }
+
+  protected formCurrentAge(): string {
+    const age = this.form().age;
+    if (age === null) return 'Indica la edad al entrar';
+    const current = this.currentAge(age, this.form().arrivalDate);
+    return `${current} ${current === 1 ? 'año' : 'años'} actualmente`;
+  }
+
+  private storySummary(story: string): string {
+    const clean = story.trim().replace(/\s+/g, ' ');
+    if (clean.length <= 180) return clean;
+    return `${clean.slice(0, 177).trimEnd()}…`;
   }
 
   protected async removeAnimal(id: string): Promise<void> {
@@ -499,7 +539,12 @@ export class Dashboard implements OnInit {
 
   protected addPhotos(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const files = Array.from(input.files ?? []).filter((file) => file.type.startsWith('image/'));
+    const selected = Array.from(input.files ?? []).filter((file) => file.type.startsWith('image/'));
+    const files = selected.filter((file) => file.size <= 15 * 1024 * 1024);
+
+    if (files.length !== selected.length) {
+      this.saveError.set('Cada imagen debe pesar menos de 15 MB antes de optimizarla.');
+    }
 
     if (!files.length) {
       return;
@@ -515,6 +560,7 @@ export class Dashboard implements OnInit {
     this.form.update((current) => ({
       ...current,
       photos: current.photos.filter((_, photoIndex) => photoIndex !== index),
+      ...(index === 0 ? { photoFocusX: 50, photoFocusY: 50 } : {}),
     }));
   }
 
@@ -526,6 +572,7 @@ export class Dashboard implements OnInit {
 
   protected makePrimaryPhoto(index: number): void {
     this.movePhoto(index, 0);
+    this.form.update((current) => ({ ...current, photoFocusX: 50, photoFocusY: 50 }));
   }
 
   protected movePhoto(index: number, destination: number): void {
@@ -563,7 +610,7 @@ export class Dashboard implements OnInit {
       available: 'Disponible',
       reserved: 'Reservado',
       adopted: 'Adoptado',
-      medical: 'En cuidados',
+      medical: 'En cuidados médicos',
     };
 
     return labels[status];

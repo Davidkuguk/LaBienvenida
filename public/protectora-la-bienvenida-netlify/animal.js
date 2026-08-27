@@ -19,15 +19,15 @@
     const image = document.querySelector('#animal-image');
     image.src = animal.photos[0] || '';
     image.alt = `${animal.name}, animal en adopción`;
-    setupGallery(animal.photos, animal.name);
+    image.style.objectPosition = `${clampFocus(animal.photoFocusX)}% ${clampFocus(animal.photoFocusY)}%`;
+    setupGallery(animal.photos, animal.name, clampFocus(animal.photoFocusX), clampFocus(animal.photoFocusY));
     document.querySelector('#animal-status').textContent = statusLabel(animal.status);
     document.querySelector('#animal-name').textContent = animal.name;
     document.querySelector('#story-title').textContent = `Conoce a ${animal.name}`;
     document.querySelector('#animal-story').textContent = animal.notes || animal.description;
-    document.querySelector('#ideal-title').textContent = animal.idealHome;
 
     const facts = [
-      ['Edad', `${animal.age} ${animal.age === 1 ? 'año' : 'años'}`],
+      ['Edad', `${currentAge(animal.age, animal.arrivalDate)} ${currentAge(animal.age, animal.arrivalDate) === 1 ? 'año' : 'años'}`],
       ['Sexo', animal.sex],
       ['Tamaño', `${animal.size} · ${animal.weight}`],
       ['Llegada', formatDate(animal.arrivalDate)],
@@ -37,18 +37,8 @@
       `<div class="fact ${label === 'Ejercicio' ? 'exercise-fact' : ''}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`
     ).join('') + `<div class="fact medical-fact"><div><span>Estado veterinario</span><strong>${escapeHtml(animal.medicalStatus)}</strong><small>${escapeHtml(animal.medicalDetail)}</small></div><b>Información actualizada</b></div>`;
 
-    document.querySelector('#care-grid').innerHTML = [
-      ['♡', 'Carácter', animal.description],
-      ['✚', 'Salud', animal.medicalDetail],
-      ['⌂', 'Actividad', exerciseLabel(animal.exercise)],
-      ['●', 'Necesita', animal.idealHome],
-    ].map(([icon, title, copy]) =>
-      `<div class="care-item"><span class="care-icon">${icon}</span><h3>${title}</h3><p>${escapeHtml(copy)}</p></div>`
-    ).join('');
-
     document.querySelector('#compat-list').innerHTML = [
-      ['Con adultos', animal.compatibleAdults],
-      ['Con niños', animal.compatibleChildren],
+      ['Con personas', animal.compatibleAdults],
       ['Con perros', animal.compatibleDogs],
       ['Con gatos', animal.compatibleCats],
     ].map(([label, value]) =>
@@ -62,13 +52,25 @@
   }
 
   function statusLabel(status) {
-    return { available: 'Disponible para adoptar', reserved: 'Reservado', adopted: 'Adoptado', medical: 'En cuidados' }[status];
+    return { available: 'Disponible para adoptar', reserved: 'Reservado', adopted: 'Adoptado', medical: 'En cuidados médicos' }[status];
   }
   function exerciseLabel(value) {
     const level = String(value || '').split('·')[0].trim().toLowerCase();
     if (level.includes('alto')) return 'Alto';
     if (level.includes('bajo')) return 'Bajo';
     return 'Medio';
+  }
+  function clampFocus(value) {
+    const number = Number(value);
+    return Number.isFinite(number) ? Math.min(100, Math.max(0, number)) : 50;
+  }
+  function currentAge(ageAtArrival, arrivalDate) {
+    const arrival = new Date(`${arrivalDate}T00:00:00`);
+    if (!arrivalDate || Number.isNaN(arrival.getTime())) return ageAtArrival;
+    const today = new Date();
+    let years = today.getFullYear() - arrival.getFullYear();
+    if (today.getMonth() < arrival.getMonth() || (today.getMonth() === arrival.getMonth() && today.getDate() < arrival.getDate())) years--;
+    return ageAtArrival + Math.max(0, years);
   }
   function formatDate(date) {
     if (!date) return 'Sin indicar';
@@ -131,7 +133,7 @@
     });
   }
 
-  function setupGallery(photos, name) {
+  function setupGallery(photos, name, focusX, focusY) {
     const images = photos.length ? photos : [''];
     const main = document.querySelector('#animal-image');
     const thumbnails = document.querySelector('#animal-thumbnails');
@@ -142,6 +144,7 @@
     const select = (index) => {
       current = (index + images.length) % images.length;
       main.src = images[current];
+      main.style.objectPosition = current === 0 ? `${focusX}% ${focusY}%` : '50% 50%';
       lightboxImage.src = images[current];
       thumbnails.querySelectorAll('button').forEach((button, buttonIndex) => {
         const active = buttonIndex === current;

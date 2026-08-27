@@ -19,3 +19,199 @@ body {
     "Segoe UI",
     sans-serif;
 }
+
+app-dashboard .current-age-note {
+  color: #60705f;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+app-dashboard .photo-focus-editor {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #ddd7ca;
+  border-radius: 8px;
+  background: #f5f0e6;
+}
+
+app-dashboard .focus-preview {
+  height: 180px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #e4ded2;
+}
+
+app-dashboard .focus-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+app-dashboard .focus-controls {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+app-dashboard .focus-controls input[type='range'] {
+  height: auto;
+  padding: 0;
+}
+
+app-dashboard .focus-controls small {
+  color: #60705f;
+}
+
+app-dashboard .animal-table-wrap {
+  max-width: 100%;
+  margin: 20px;
+  overflow-x: auto;
+  border: 1px solid #ddd7ca;
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+app-dashboard .animal-table {
+  width: 100%;
+  min-width: 1050px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+app-dashboard .animal-table th,
+app-dashboard .animal-table td {
+  min-width: 0;
+  padding: 12px;
+  border-bottom: 1px solid #e4ded2;
+  vertical-align: middle;
+}
+
+app-dashboard .animal-table th {
+  color: #60705f;
+  background: #f5f0e6;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+app-dashboard .animal-table td > strong,
+app-dashboard .animal-table td > small {
+  display: block;
+}
+
+app-dashboard .animal-table td > small {
+  margin-top: 4px;
+  color: #60705f;
+}
+
+app-dashboard .table-animal-photo,
+app-dashboard .table-animal-placeholder {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 8px;
+  background: #e9e3d7;
+  object-fit: cover;
+  font-weight: 900;
+}
+
+app-dashboard .table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+app-dashboard .table-actions button {
+  border: 1px solid #cfc9bd;
+  border-radius: 7px;
+  padding: 7px 9px;
+  color: #1f5548;
+  background: #fffdf8;
+  font-weight: 750;
+}
+
+app-dashboard .table-actions .danger {
+  color: #8a342f;
+  border-color: #efc4c0;
+}
+
+app-dashboard .animal-detail-row td {
+  padding: 0;
+  background: #faf6ed;
+}
+
+app-dashboard .table-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+}
+
+app-dashboard .table-detail-grid section {
+  min-width: 0;
+  padding: 13px;
+  border-left: 3px solid #e96b3b;
+  background: #fffdf8;
+}
+
+app-dashboard .table-detail-grid span {
+  display: block;
+  margin-bottom: 7px;
+  color: #60705f;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+app-dashboard .table-detail-grid p {
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+app-dashboard .table-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+  padding: 0 18px 18px;
+}
+
+app-dashboard .table-gallery img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+@media (max-width: 760px) {
+  app-dashboard .photo-focus-editor {
+    grid-template-columns: 1fr;
+  }
+
+  app-dashboard .focus-preview {
+    height: clamp(180px, 60vw, 300px);
+  }
+
+  app-dashboard .animal-table-wrap {
+    margin: 14px;
+  }
+
+  app-dashboard .table-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  app-dashboard .animal-table-wrap {
+    margin: 12px;
+  }
+
+  app-dashboard .table-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
