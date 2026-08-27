@@ -165,6 +165,7 @@ export class Dashboard implements OnInit {
   protected readonly saveError = signal('');
   protected readonly saving = signal(false);
   protected readonly showValidation = signal(false);
+  protected readonly pendingDeletion = signal<{ animal: ShelterAnimal; index: number; timer: ReturnType<typeof setTimeout> } | null>(null);
   protected readonly statusFilter = signal<AnimalStatus | 'all'>('all');
   protected readonly speciesFilter = signal('all');
   protected readonly sexFilter = signal<ShelterAnimal['sex'] | 'all'>('all');
@@ -392,7 +393,28 @@ export class Dashboard implements OnInit {
 
   protected async removeAnimal(id: string): Promise<void> {
     if (!confirm('¿Seguro que quieres eliminar este animal de la web?')) return;
+    const existing = this.pendingDeletion();
+    if (existing) clearTimeout(existing.timer);
+    const index = this.animals().findIndex((animal) => animal.id === id);
+    const animal = this.animals()[index];
+    if (!animal) return;
     this.saveError.set('');
+    await this.commitDeletion(id);
+    const timer = setTimeout(() => this.pendingDeletion.set(null), 48 * 60 * 60 * 1000);
+    this.pendingDeletion.set({ animal, index, timer });
+  }
+
+  protected undoDeletion(): void {
+    const pending = this.pendingDeletion();
+    if (!pending) return;
+    clearTimeout(pending.timer);
+    this.pendingDeletion.set(null);
+    void this.restoreDeletion(pending.animal.id);
+  }
+
+  private async commitDeletion(id: string): Promise<void> {
+    const pending = this.pendingDeletion();
+    if (pending?.animal.id === id) this.pendingDeletion.set(null);
     try {
       const response = await fetch(`/.netlify/functions/animals?id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
@@ -448,6 +470,12 @@ export class Dashboard implements OnInit {
       ...current,
       photos: current.photos.filter((_, photoIndex) => photoIndex !== index),
     }));
+  }
+
+  private async restoreDeletion(id: string): Promise<void> {
+    const response = await fetch(`/.netlify/functions/animals?id=${encodeURIComponent(id)}`, { method: 'PATCH', headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+    const data = (await response.json().catch(() => null)) as { animals?: ShelterAnimal[] } | null;
+    if (response.ok && Array.isArray(data?.animals)) this.animals.set(data.animals);
   }
 
   protected makePrimaryPhoto(index: number): void {

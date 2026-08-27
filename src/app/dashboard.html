@@ -424,6 +424,13 @@
           </div>
         </div>
 
+        @if (pendingDeletion()) {
+          <div class="undo-notice" role="status">
+            <span>{{ pendingDeletion()!.animal.name }} estará en la papelera durante 48 horas.</span>
+            <button type="button" (click)="undoDeletion()">Deshacer</button>
+          </div>
+        }
+
         @if (filteredAnimals().length) {
           <div class="animal-list">
             @for (animal of filteredAnimals(); track animal.id) {

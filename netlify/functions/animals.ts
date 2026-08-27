@@ -60,24 +60,34 @@ function validAnimal(value: unknown): value is AnimalRecord {
 
 export default async (request: Request, _context: Context): Promise<Response> => {
   if (request.method === 'GET') {
-    return Response.json({ animals: await readAnimals() }, { headers: { 'Cache-Control': 'no-store' } });
+    const animals = await readAnimals();
+    const trash = new URL(request.url).searchParams.get('trash') === 'true';
+    if (trash && !(await isAuthenticated(request))) return Response.json({ error: 'Sesión de administración no válida' }, { status: 401 });
+    return Response.json({ animals: animals.filter((animal) => trash ? Boolean(animal.deletedAt) : !animal.deletedAt) }, { headers: { 'Cache-Control': 'no-store' } });
   }
-  if (!['POST', 'PUT', 'DELETE'].includes(request.method)) {
-    return new Response('Método no permitido', { status: 405, headers: { Allow: 'GET, POST, PUT, DELETE' } });
+  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
+    return new Response('Método no permitido', { status: 405, headers: { Allow: 'GET, POST, PUT, PATCH, DELETE' } });
   }
   if (!(await isAuthenticated(request))) {
     return Response.json({ error: 'Sesión de administración no válida' }, { status: 401 });
   }
 
   const animals = await readAnimals();
+  if (request.method === 'PATCH') {
+    const id = new URL(request.url).searchParams.get('id');
+    if (!id || !animals.some((animal) => animal.id === id && animal.deletedAt)) return Response.json({ error: 'Animal no encontrado' }, { status: 404 });
+    const updated = animals.map((animal) => animal.id === id ? { ...animal, deletedAt: undefined } : animal);
+    await store().setJSON(key, updated);
+    return Response.json({ animals: updated.filter((animal) => !animal.deletedAt) });
+  }
   if (request.method === 'DELETE') {
     const id = new URL(request.url).searchParams.get('id');
     if (!id || !animals.some((animal) => animal.id === id)) {
       return Response.json({ error: 'Animal no encontrado' }, { status: 404 });
     }
-    const updated = animals.filter((animal) => animal.id !== id);
+    const updated = animals.map((animal) => animal.id === id ? { ...animal, deletedAt: new Date().toISOString() } : animal);
     await store().setJSON(key, updated);
-    return Response.json({ animals: updated });
+    return Response.json({ animals: updated.filter((animal) => !animal.deletedAt) });
   }
 
   const animal = await request.json().catch(() => null);

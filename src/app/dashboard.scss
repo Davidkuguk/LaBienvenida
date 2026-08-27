@@ -212,7 +212,6 @@ button {
   cursor: pointer;
 }
 
-.primary-action,
 .submit-button {
   border: 0;
   border-radius: 8px;
@@ -220,11 +219,6 @@ button {
   background: #d7ed91;
   font-weight: 800;
   box-shadow: 0 10px 24px rgb(90 116 57 / 18%);
-}
-
-.primary-action {
-  padding: 12px 18px;
-  white-space: nowrap;
 }
 
 .metrics {
@@ -735,6 +729,28 @@ textarea:focus {
   text-align: center;
 }
 
+.undo-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 20px 20px 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: #5f3916;
+  background: #f8e7bd;
+  font-weight: 700;
+}
+
+.undo-notice button {
+  border: 0;
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: #fff;
+  background: var(--orange);
+  font-weight: 800;
+}
+
 @media (max-width: 1160px) {
   .dashboard-shell {
     grid-template-columns: 1fr;
@@ -791,7 +807,6 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 
-  .primary-action,
   .status-pill {
     width: fit-content;
   }
@@ -802,14 +817,12 @@ textarea:focus {
   color: var(--orange);
 }
 
-.primary-action,
 .submit-button {
   color: #fff;
   background: var(--orange);
   box-shadow: 0 10px 24px rgb(233 107 59 / 20%);
 }
 
-.primary-action:hover,
 .submit-button:hover:not(:disabled) {
   background: #cc5127;
 }

@@ -22,6 +22,7 @@ export interface AnimalRecord {
   compatibleChildren: string;
   compatibleDogs: string;
   compatibleCats: string;
+  deletedAt?: string;
 }
 
 const images = [
