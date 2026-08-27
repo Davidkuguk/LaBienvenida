@@ -166,6 +166,11 @@ export class Dashboard implements OnInit {
   protected readonly saving = signal(false);
   protected readonly showValidation = signal(false);
   protected readonly statusFilter = signal<AnimalStatus | 'all'>('all');
+  protected readonly speciesFilter = signal('all');
+  protected readonly sexFilter = signal<ShelterAnimal['sex'] | 'all'>('all');
+  protected readonly sizeFilter = signal<ShelterAnimal['size'] | 'all'>('all');
+  protected readonly arrivalFilter = signal<'all' | '30' | '90' | 'older'>('all');
+  protected readonly sortBy = signal<'recent' | 'oldest' | 'status'>('recent');
   protected readonly searchTerm = signal('');
   protected readonly sidebarCollapsed = signal(false);
   protected readonly visitorCount = signal<number | null>(null);
@@ -178,8 +183,14 @@ export class Dashboard implements OnInit {
     const status = this.statusFilter();
     const search = this.searchTerm().trim().toLowerCase();
 
-    return this.animals().filter((animal) => {
+    const threshold = Date.now() - Number(this.arrivalFilter()) * 24 * 60 * 60 * 1000;
+    const filtered = this.animals().filter((animal) => {
       const matchesStatus = status === 'all' || animal.status === status;
+      const matchesSpecies = this.speciesFilter() === 'all' || animal.species === this.speciesFilter();
+      const matchesSex = this.sexFilter() === 'all' || animal.sex === this.sexFilter();
+      const matchesSize = this.sizeFilter() === 'all' || animal.size === this.sizeFilter();
+      const arrival = new Date(`${animal.arrivalDate}T00:00:00`).getTime();
+      const matchesArrival = this.arrivalFilter() === 'all' || (this.arrivalFilter() === 'older' ? arrival < Date.now() - 90 * 24 * 60 * 60 * 1000 : arrival >= threshold);
       const matchesSearch =
         !search ||
         [animal.name, animal.species, animal.breed, animal.exercise, animal.idealHome]
@@ -187,7 +198,12 @@ export class Dashboard implements OnInit {
           .toLowerCase()
           .includes(search);
 
-      return matchesStatus && matchesSearch;
+      return matchesStatus && matchesSpecies && matchesSex && matchesSize && matchesArrival && matchesSearch;
+    });
+    return filtered.sort((left, right) => {
+      if (this.sortBy() === 'status') return this.statusLabel(left.status).localeCompare(this.statusLabel(right.status));
+      const difference = new Date(right.arrivalDate).getTime() - new Date(left.arrivalDate).getTime();
+      return this.sortBy() === 'recent' ? difference : -difference;
     });
   });
 

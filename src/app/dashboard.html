@@ -406,6 +406,21 @@
               <option value="adopted">Adoptados</option>
               <option value="medical">En cuidados</option>
             </select>
+            <select [ngModel]="speciesFilter()" (ngModelChange)="speciesFilter.set($event)" aria-label="Filtrar por especie">
+              <option value="all">Todas las especies</option><option>Perro</option><option>Gato</option><option>Conejo</option><option>Ave</option><option>Otro</option>
+            </select>
+            <select [ngModel]="sexFilter()" (ngModelChange)="sexFilter.set($event)" aria-label="Filtrar por sexo">
+              <option value="all">Todos los sexos</option><option>Hembra</option><option>Macho</option>
+            </select>
+            <select [ngModel]="sizeFilter()" (ngModelChange)="sizeFilter.set($event)" aria-label="Filtrar por tamaño">
+              <option value="all">Todos los tamaños</option><option>Pequeno</option><option>Mediano</option><option>Grande</option>
+            </select>
+            <select [ngModel]="arrivalFilter()" (ngModelChange)="arrivalFilter.set($event)" aria-label="Filtrar por antigüedad">
+              <option value="all">Cualquier fecha</option><option value="30">Últimos 30 días</option><option value="90">Últimos 90 días</option><option value="older">Más de 90 días</option>
+            </select>
+            <select [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)" aria-label="Ordenar inventario">
+              <option value="recent">Más recientes</option><option value="oldest">Más antiguos</option><option value="status">Por estado</option>
+            </select>
           </div>
         </div>
 

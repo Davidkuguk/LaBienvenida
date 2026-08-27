@@ -577,6 +577,7 @@ textarea:focus {
 
 .filters {
   gap: 10px;
+  flex-wrap: wrap;
 
   input {
     width: min(280px, 36vw);
