@@ -88,6 +88,8 @@ export class Dashboard implements OnInit {
   protected readonly activeSection = signal<'new' | 'inventory' | 'requests' | 'fosters'>('new');
   protected readonly fosters = signal<Foster[]>([]);
   protected readonly fosterForm = signal<Omit<Foster, 'id'>>({ animalId: '', animalName: '', carerName: '', phone: '', email: '', address: '', startDate: new Date().toISOString().slice(0, 10), endDate: '', status: 'pending', notes: '' });
+  protected readonly editingFosterId = signal<string | null>(null);
+  protected readonly selectedFoster = signal<Foster | null>(null);
   /*
   protected readonly legacyAnimals = signal<ShelterAnimal[]>([
     {
@@ -239,10 +241,15 @@ export class Dashboard implements OnInit {
   protected async saveFoster(): Promise<void> {
     const form = this.fosterForm();
     const animal = this.animals().find((item) => item.id === form.animalId);
-    const response = await fetch('/.netlify/functions/fosters', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ ...form, animalName: animal?.name || '' }) });
+    const id = this.editingFosterId();
+    const response = await fetch('/.netlify/functions/fosters', { method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ ...form, ...(id ? { id } : {}), animalName: animal?.name || form.animalName }) });
     const data = await response.json().catch(() => null) as { fosters?: Foster[] } | null;
-    if (response.ok && Array.isArray(data?.fosters)) { this.fosters.set(data.fosters); this.fosterForm.set({ animalId: '', animalName: '', carerName: '', phone: '', email: '', address: '', startDate: new Date().toISOString().slice(0, 10), endDate: '', status: 'pending', notes: '' }); }
+    if (response.ok && Array.isArray(data?.fosters)) { this.fosters.set(data.fosters); this.editingFosterId.set(null); this.fosterForm.set({ animalId: '', animalName: '', carerName: '', phone: '', email: '', address: '', startDate: new Date().toISOString().slice(0, 10), endDate: '', status: 'pending', notes: '' }); }
   }
+
+  protected openFoster(foster: Foster): void { this.selectedFoster.set(foster); }
+  protected editFoster(foster: Foster): void { this.editingFosterId.set(foster.id); this.fosterForm.set({ ...foster }); }
+  protected async deleteFoster(foster: Foster): Promise<void> { if (!confirm(`¿Eliminar la acogida de ${foster.animalName}?`)) return; const response = await fetch(`/.netlify/functions/fosters?id=${encodeURIComponent(foster.id)}`, { method: 'DELETE', credentials: 'same-origin' }); const data = await response.json().catch(() => null) as { fosters?: Foster[] } | null; if (response.ok && Array.isArray(data?.fosters)) { this.fosters.set(data.fosters); if (this.selectedFoster()?.id === foster.id) this.selectedFoster.set(null); } }
 
   private async loadRequests(): Promise<void> {
     try {

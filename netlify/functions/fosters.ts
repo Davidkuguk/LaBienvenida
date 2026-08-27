@@ -26,7 +26,14 @@ export default async (request: Request, _context: Context): Promise<Response> =>
   if (!(await authenticated(request))) return Response.json({ error: 'Sesión de administración no válida' }, { status: 401 });
   const fosters = ((await store().get(key, { type: 'json' })) as Foster[] | null) ?? [];
   if (request.method === 'GET') return Response.json({ fosters });
-  if (!['POST', 'PUT'].includes(request.method)) return new Response('Método no permitido', { status: 405, headers: { Allow: 'GET, POST, PUT' } });
+  if (request.method === 'DELETE') {
+    const id = new URL(request.url).searchParams.get('id');
+    if (!id || !fosters.some((foster) => foster.id === id)) return Response.json({ error: 'Acogida no encontrada' }, { status: 404 });
+    const updated = fosters.filter((foster) => foster.id !== id);
+    await store().setJSON(key, updated);
+    return Response.json({ fosters: updated });
+  }
+  if (!['POST', 'PUT'].includes(request.method)) return new Response('Método no permitido', { status: 405, headers: { Allow: 'GET, POST, PUT, DELETE' } });
   const body = await request.json().catch(() => null) as Partial<Foster> | null;
   if (!body?.animalId || !body.carerName?.trim() || !body.phone?.trim() || !body.address?.trim() || !body.startDate || !body.status) return Response.json({ error: 'Completa los campos obligatorios de la acogida.' }, { status: 400 });
   const record: Foster = { id: body.id || crypto.randomUUID(), animalId: body.animalId, animalName: body.animalName || '', carerName: body.carerName.trim(), phone: body.phone.trim(), email: body.email?.trim() || '', address: body.address.trim(), startDate: body.startDate, endDate: body.endDate || '', status: body.status, notes: body.notes?.trim() || '' };

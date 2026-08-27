@@ -138,7 +138,8 @@
       lightboxImage.src = images[current];
       thumbnails.querySelectorAll('button').forEach((button, buttonIndex) => button.classList.toggle('active', buttonIndex === current));
     };
-    thumbnails.innerHTML = images.map((photo, index) => `<button type="button" aria-label="Ver foto ${index + 1} de ${name}"><img src="${escapeHtml(photo)}" alt="Miniatura ${index + 1} de ${name}"></button>`).join('');
+    thumbnails.hidden = images.length < 2;
+    thumbnails.innerHTML = images.map((_, index) => `<button type="button" aria-label="Ver foto ${index + 1} de ${name}"></button>`).join('');
     thumbnails.querySelectorAll('button').forEach((button, index) => button.addEventListener('click', () => select(index)));
     main.addEventListener('click', () => { if (images[0]) { lightbox.hidden = false; select(current); } });
     document.querySelector('#photo-lightbox-close').addEventListener('click', () => { lightbox.hidden = true; });
