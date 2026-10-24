@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <base href="/protectora-la-bienvenida-netlify/" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="description" content="Ayuda a La Bienvenida mediante voluntariado, acogida, Teaming o una donación segura con PayPal." />
+    <meta name="description" content="Ayuda a La Bienvenida mediante voluntariado, acogida, Teaming o una donación con PayPal o Bizum." />
     <meta name="robots" content="index,follow" />
     <meta name="theme-color" content="#16332d" />
     <title>Cómo ayudar · La Bienvenida</title>
@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="access.css" />
     <link rel="stylesheet" href="pages.css" />
     <link rel="stylesheet" href="responsive.css" />
+    <link rel="stylesheet" href="donation-links.css" />
   </head>
   <body>
     <header class="site-header">
@@ -79,6 +80,14 @@
           rel="noopener noreferrer"
           >Donar con PayPal</a
         >
+        <div class="bizum-donation" aria-labelledby="bizum-title">
+          <h3 id="bizum-title">Donar con Bizum</h3>
+          <p>Código de donación: <strong id="bizum-code">15110</strong></p>
+          <button class="button button-light" type="button" id="bizum-button" aria-describedby="bizum-instructions">Copiar código Bizum</button>
+          <p id="bizum-instructions">Abre la app de tu banco, entra en Bizum y elige «Donar a ONG». Pega el código 15110, introduce el importe y comprueba que el destinatario sea La Bienvenida antes de confirmar.</p>
+          <p id="bizum-status" role="status" aria-live="polite"></p>
+          <noscript><p>Puedes copiar manualmente el código 15110 para donar desde tu app bancaria.</p></noscript>
+        </div>
       </section>
     </main>
     <footer>

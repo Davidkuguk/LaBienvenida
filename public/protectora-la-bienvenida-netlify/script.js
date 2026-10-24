@@ -103,3 +103,37 @@ document.querySelectorAll('.animal-card').forEach((card) => {
     if (event.key === 'Enter') open(event);
   });
 });
+
+// Bizum NGO donations are completed inside the donor's banking app.
+const bizumButton = document.querySelector('#bizum-button');
+if (bizumButton) {
+  bizumButton.addEventListener('click', async () => {
+    const code = document.querySelector('#bizum-code').textContent.trim();
+    const status = document.querySelector('#bizum-status');
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(code);
+      copied = true;
+    } catch {
+      const input = document.createElement('textarea');
+      input.value = code;
+      input.setAttribute('readonly', '');
+      input.style.position = 'fixed';
+      input.style.opacity = '0';
+      document.body.appendChild(input);
+      input.select();
+      input.setSelectionRange(0, code.length);
+      try {
+        copied = document.execCommand('copy');
+      } catch {
+        copied = false;
+      } finally {
+        input.remove();
+        bizumButton.focus({ preventScroll: true });
+      }
+    }
+    status.textContent = copied
+      ? `Código ${code} copiado. Abre la app de tu banco y selecciona Bizum > Donar a ONG.`
+      : `No se ha podido copiar. Copia manualmente el código ${code} y abre Bizum > Donar a ONG en la app de tu banco.`;
+  });
+}
