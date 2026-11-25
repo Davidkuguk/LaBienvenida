@@ -99,12 +99,65 @@
     const image = gallery.querySelector('img');
     const dots = [...gallery.querySelectorAll('.catalog-gallery-dots button')];
     let startX = null;
+    let requestedIndex = 0;
+    let requestId = 0;
+    const loadedPhotos = new Map();
+    const normalize = (index) => (index + photos.length) % photos.length;
+    const loadPhoto = (index) => {
+      index = normalize(index);
+      if (!loadedPhotos.has(index)) {
+        const pending = new Promise((resolve, reject) => {
+          const preload = new Image();
+          preload.decoding = 'async';
+          preload.onload = async () => {
+            try { await preload.decode(); } catch { /* The loaded image can still be displayed. */ }
+            resolve(preload);
+          };
+          preload.onerror = () => reject(new Error('Photo unavailable'));
+          preload.src = photos[index];
+        }).catch((error) => { loadedPhotos.delete(index); throw error; });
+        loadedPhotos.set(index, pending);
+      }
+      return loadedPhotos.get(index);
+    };
+    const preloadAdjacent = (index) => {
+      loadPhoto(index + 1).catch(() => {});
+      loadPhoto(index - 1).catch(() => {});
+    };
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          preloadAdjacent(Number(gallery.dataset.currentPhoto || 0));
+          observer.disconnect();
+        }
+      }, { rootMargin: '200px' });
+      observer.observe(gallery);
+    } else {
+      preloadAdjacent(0);
+    }
+    gallery.addEventListener('pointerenter', () => preloadAdjacent(requestedIndex));
+    gallery.addEventListener('focusin', () => preloadAdjacent(requestedIndex));
 
     gallery.addEventListener('click', (event) => event.stopPropagation());
 
-    const show = (nextIndex) => {
-      const index = (nextIndex + photos.length) % photos.length;
+    const show = async (nextIndex) => {
+      const index = normalize(nextIndex);
+      requestedIndex = index;
+      const currentRequest = ++requestId;
+      gallery.setAttribute('aria-busy', 'true');
+      try {
+        await loadPhoto(index);
+      } catch {
+        if (currentRequest === requestId) {
+          requestedIndex = Number(gallery.dataset.currentPhoto || 0);
+          gallery.setAttribute('aria-busy', 'false');
+        }
+        return;
+      }
+      if (currentRequest !== requestId) return;
+      gallery.setAttribute('aria-busy', 'false');
       gallery.dataset.currentPhoto = String(index);
+      image.loading = 'eager';
       image.src = photos[index];
       image.style.objectPosition = index === 0 ? `${gallery.dataset.focusX}% ${gallery.dataset.focusY}%` : '50% 50%';
       image.alt = `${image.alt.split(' — ')[0]} — foto ${index + 1} de ${photos.length}`;
@@ -113,8 +166,9 @@
         dot.classList.toggle('active', active);
         dot.setAttribute('aria-current', String(active));
       });
+      preloadAdjacent(index);
     };
-    const move = (amount) => show(Number(gallery.dataset.currentPhoto || 0) + amount);
+    const move = (amount) => show(requestedIndex + amount);
     gallery.querySelector('.catalog-gallery-prev').addEventListener('click', (event) => { event.stopPropagation(); move(-1); });
     gallery.querySelector('.catalog-gallery-next').addEventListener('click', (event) => { event.stopPropagation(); move(1); });
     dots.forEach((dot, index) => dot.addEventListener('click', (event) => { event.stopPropagation(); show(index); }));
