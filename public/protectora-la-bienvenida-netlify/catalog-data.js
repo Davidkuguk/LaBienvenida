@@ -8,14 +8,7 @@
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
     })[character]);
 
-  try {
-    const response = await fetch('/.netlify/functions/animals?view=catalog', {
-      headers: { Accept: 'application/json' },
-    });
-    if (!response.ok) throw new Error();
-    const { animals } = await response.json();
-    const orderedAnimals = [...animals].sort((left, right) => Number(Boolean(right.urgent)) - Number(Boolean(left.urgent)));
-    grid.innerHTML = orderedAnimals.map((animal) => {
+  const renderAnimal = (animal) => {
       const photos = Array.isArray(animal.photos) && animal.photos.length ? animal.photos : [''];
       const focusX = clampFocus(animal.photoFocusX);
       const focusY = clampFocus(animal.photoFocusY);
@@ -40,33 +33,97 @@
           <button class="circle-button" type="button" aria-label="Ver a ${escapeHtml(animal.name)}">↗</button>
         </div>
       </article>`;
-    }).join('');
 
-    const cards = [...grid.querySelectorAll('.animal-card')];
-    const open = (card) => { location.href = `/animal?id=${card.dataset.animalId}`; };
-    cards.forEach((card) => {
-      card.addEventListener('click', () => open(card));
-      card.addEventListener('keydown', (event) => { if (event.key === 'Enter') open(card); });
-    });
-    grid.querySelectorAll('.catalog-photo').forEach((gallery) => setupQuickGallery(gallery));
-    document.querySelectorAll('.filter').forEach((button) => {
-      button.onclick = () => {
-        document.querySelectorAll('.filter').forEach((item) => item.classList.remove('active'));
-        button.classList.add('active');
-        let visible = 0;
-        cards.forEach((card) => {
-          const hidden = button.dataset.filter !== 'all' && card.dataset.type !== button.dataset.filter;
-          card.classList.toggle('hidden', hidden);
-          if (!hidden) visible++;
-        });
-        count.textContent = `${visible} ${visible === 1 ? 'animal' : 'animales'}`;
-      };
-    });
-    count.textContent = `${orderedAnimals.length} ${orderedAnimals.length === 1 ? 'animal' : 'animales'}`;
-  } catch {
-    grid.innerHTML = '<p class="catalog-error">No hemos podido cargar los animales. Inténtalo de nuevo en unos minutos.</p>';
-    count.textContent = 'Datos no disponibles';
+  };
+  let offset = 0;
+  let species = document.querySelector('.filter.active')?.dataset.filter || 'all';
+  let hasMore = true;
+  let loading = false;
+  let generation = 0;
+  let controller;
+  const more = document.createElement('button');
+  more.type = 'button';
+  more.className = 'catalog-load-more';
+  more.textContent = 'Cargar más animales';
+  grid.after(more);
+  const status = document.createElement('p');
+  status.setAttribute('role', 'status');
+  more.after(status);
+  let observer;
+  const loadMore = async () => {
+    if (loading || !hasMore) return;
+    const currentGeneration = generation;
+    controller = new AbortController();
+    loading = true;
+    more.disabled = true;
+    status.textContent = 'Cargando animales…';
+    try {
+      const pageSize = window.matchMedia('(min-width: 851px)').matches ? 25 : 10;
+      const params = new URLSearchParams({ view: 'catalog', limit: String(pageSize), offset: String(offset), species });
+      const response = await fetch('/.netlify/functions/animals?' + params, {
+        headers: { Accept: 'application/json' }, signal: controller.signal,
+      });
+      if (!response.ok) throw new Error();
+      const { animals, total, hasMore: nextPage } = await response.json();
+      if (currentGeneration !== generation) return;
+      const fragment = document.createElement('template');
+      fragment.innerHTML = animals.map(renderAnimal).join('');
+      const cards = [...fragment.content.querySelectorAll('.animal-card')];
+      cards.forEach((card) => {
+        const open = () => { location.href = `/animal?id=${card.dataset.animalId}`; };
+        card.addEventListener('click', open);
+        card.addEventListener('keydown', (event) => { if (event.key === 'Enter' && event.target === card) open(); });
+        card.querySelectorAll('.catalog-photo').forEach(setupQuickGallery);
+      });
+      grid.append(fragment.content);
+      offset += animals.length;
+      hasMore = Boolean(nextPage) && animals.length > 0;
+      count.textContent = `${total} ${total === 1 ? 'animal' : 'animales'}`;
+      status.textContent = total === 0 ? 'No hay animales con este filtro.' : '';
+      more.hidden = !hasMore;
+      if (hasMore && observer) {
+        observer.unobserve(more);
+        observer.observe(more);
+      }
+    } catch (error) {
+      if (currentGeneration !== generation || error.name === 'AbortError') return;
+      status.textContent = 'No hemos podido cargar los animales. Pulsa para reintentar.';
+      more.textContent = 'Reintentar';
+    } finally {
+      if (currentGeneration === generation) {
+        loading = false;
+        more.disabled = false;
+      }
+    }
+  };
+  more.addEventListener('click', loadMore);
+  if ('IntersectionObserver' in window) {
+    observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) loadMore();
+    }, { rootMargin: '300px' });
   }
+  const reset = () => {
+    generation++;
+    controller?.abort();
+    observer?.unobserve(more);
+    loading = false;
+    offset = 0;
+    hasMore = true;
+    grid.innerHTML = '';
+    count.textContent = 'Cargando…';
+    more.hidden = false;
+    more.textContent = 'Cargar más animales';
+    loadMore();
+  };
+  document.querySelectorAll('.filter').forEach((button) => {
+    button.onclick = () => {
+      document.querySelectorAll('.filter').forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      species = button.dataset.filter;
+      reset();
+    };
+  });
+  reset();
 
   function statusLabel(status) {
     return { reserved: 'Reservado', adopted: 'Adoptado', medical: 'En cuidados médicos' }[status] || 'Disponible';

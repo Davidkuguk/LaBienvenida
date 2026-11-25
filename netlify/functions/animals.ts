@@ -116,8 +116,18 @@ export default async (request: Request, _context: Context): Promise<Response> =>
       return Response.json({ animal: publicAnimal(animal) }, { headers: { 'Cache-Control': 'public, max-age=60, must-revalidate' } });
     }
     if (url.searchParams.get('view') === 'catalog') {
+      const species = url.searchParams.get('species');
+      const catalog = activeAnimals
+        .filter((animal) => !species || species === 'all' || animal.species.toLowerCase() === species)
+        .sort((left, right) => Number(Boolean(right.urgent)) - Number(Boolean(left.urgent)));
+      const limitValue = Number(url.searchParams.get('limit'));
+      const paginated = url.searchParams.has('limit');
+      const limit = Number.isInteger(limitValue) && limitValue > 0 ? Math.min(limitValue, 50) : 10;
+      const offsetValue = Number(url.searchParams.get('offset'));
+      const offset = Number.isInteger(offsetValue) && offsetValue >= 0 ? offsetValue : 0;
+      const page = paginated ? catalog.slice(offset, offset + limit) : catalog;
       return Response.json(
-        { animals: activeAnimals.map(catalogAnimal) },
+        { animals: page.map(catalogAnimal), total: catalog.length, hasMore: paginated && offset + page.length < catalog.length },
         { headers: { 'Cache-Control': 'public, max-age=60, must-revalidate' } },
       );
     }
