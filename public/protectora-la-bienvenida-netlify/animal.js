@@ -27,7 +27,7 @@
     document.querySelector('#animal-story').textContent = animal.notes || animal.description;
 
     const facts = [
-      ['Edad', `${currentAge(animal.age, animal.arrivalDate)} ${currentAge(animal.age, animal.arrivalDate) === 1 ? 'año' : 'años'}`],
+      ['Edad', currentAge(animal.age, animal.arrivalDate, animal.ageUnit)],
       ['Sexo', animal.sex],
       ['Tamaño', `${animal.size} · ${animal.weight}`],
       ['Llegada', formatDate(animal.arrivalDate)],
@@ -64,14 +64,22 @@
     const number = Number(value);
     return Number.isFinite(number) ? Math.min(100, Math.max(0, number)) : 50;
   }
-  function currentAge(ageAtArrival, arrivalDate) {
+  function currentAge(ageAtArrival, arrivalDate, ageUnit = 'years') {
     const arrival = new Date(`${arrivalDate}T00:00:00`);
-    if (!arrivalDate || Number.isNaN(arrival.getTime())) return ageAtArrival;
     const today = new Date();
-    let years = today.getFullYear() - arrival.getFullYear();
-    if (today.getMonth() < arrival.getMonth() || (today.getMonth() === arrival.getMonth() && today.getDate() < arrival.getDate())) years--;
-    return ageAtArrival + Math.max(0, years);
+    let elapsedMonths = 0;
+    if (arrivalDate && !Number.isNaN(arrival.getTime())) {
+      elapsedMonths = (today.getFullYear() - arrival.getFullYear()) * 12 + today.getMonth() - arrival.getMonth();
+      if (today.getDate() < arrival.getDate()) elapsedMonths--;
+    }
+    const months = Math.round(ageAtArrival * (ageUnit === 'months' ? 1 : 12)) + Math.max(0, elapsedMonths);
+    const years = Math.floor(months / 12);
+    const remainingMonths = months % 12;
+    const yearLabel = `${years} ${years === 1 ? 'año' : 'años'}`;
+    const monthLabel = `${remainingMonths} ${remainingMonths === 1 ? 'mes' : 'meses'}`;
+    return years === 0 ? monthLabel : remainingMonths === 0 ? yearLabel : `${yearLabel} y ${monthLabel}`;
   }
+
   function formatDate(date) {
     if (!date) return 'Sin indicar';
     return new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(date));

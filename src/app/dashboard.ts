@@ -17,6 +17,7 @@ interface ShelterAnimal {
   species: string;
   breed: string;
   age: number;
+  ageUnit?: 'years' | 'months';
   sex: 'Hembra' | 'Macho';
   size: 'Pequeno' | 'Mediano' | 'Grande';
   weight: string;
@@ -43,6 +44,7 @@ interface AnimalForm {
   species: string;
   breed: string;
   age: number | null;
+  ageMonths: number;
   sex: ShelterAnimal['sex'];
   size: ShelterAnimal['size'];
   weight: string;
@@ -69,6 +71,7 @@ const initialForm: AnimalForm = {
   species: 'Perro',
   breed: '',
   age: null,
+  ageMonths: 0,
   sex: 'Hembra',
   size: 'Mediano',
   weight: '',
@@ -180,6 +183,7 @@ export class Dashboard implements OnInit {
   protected readonly animalsLoading = signal(true);
   protected readonly saveError = signal('');
   protected readonly saving = signal(false);
+  protected readonly optimizingPhotos = signal(false);
   protected readonly showValidation = signal(false);
   protected readonly pendingDeletion = signal<{ animal: ShelterAnimal; index: number; timer: ReturnType<typeof setTimeout> } | null>(null);
   protected readonly statusFilter = signal<AnimalStatus | 'all'>('all');
@@ -349,6 +353,7 @@ export class Dashboard implements OnInit {
   }
 
   protected async saveAnimal(): Promise<void> {
+    if (this.optimizingPhotos() || this.saving()) return;
     const form = this.form();
 
     if (!form.name.trim() || !form.breed.trim() || !form.notes.trim() || form.age === null) {
@@ -363,6 +368,11 @@ export class Dashboard implements OnInit {
       return;
     }
 
+    if (!Number.isInteger(form.age) || form.age < 0 || !Number.isInteger(form.ageMonths) || form.ageMonths < 0 || form.ageMonths > 11) {
+      this.saveError.set('Indica los años y los meses con números enteros: años desde 0 y meses entre 0 y 11.');
+      return;
+    }
+
     const animal: ShelterAnimal = {
       id: this.editingId() ?? this.createId(form.name),
       name: form.name.trim(),
@@ -371,7 +381,8 @@ export class Dashboard implements OnInit {
       photoFocusY: form.photoFocusY,
       species: ['Perro', 'Gato'].includes(form.species) ? form.species : 'Otro',
       breed: form.breed.trim(),
-      age: form.age,
+      age: form.age * 12 + form.ageMonths,
+      ageUnit: 'months',
       sex: form.sex,
       size: form.size,
       weight: form.weight.trim(),
@@ -424,7 +435,8 @@ export class Dashboard implements OnInit {
       photoFocusY: animal.photoFocusY ?? 50,
       species: ['Perro', 'Gato'].includes(animal.species) ? animal.species : 'Otro',
       breed: animal.breed,
-      age: animal.age,
+      age: Math.floor(animal.ageUnit === 'months' ? animal.age / 12 : animal.age),
+      ageMonths: Math.round(animal.ageUnit === 'months' ? animal.age : animal.age * 12) % 12,
       sex: animal.sex,
       size: animal.size,
       weight: animal.weight,
@@ -452,23 +464,26 @@ export class Dashboard implements OnInit {
     this.expandedAnimalId.update((current) => current === id ? null : id);
   }
 
-  protected currentAge(ageAtArrival: number, arrivalDate: string): number {
+  protected currentAge(ageAtArrival: number, arrivalDate: string, ageUnit: 'years' | 'months' = 'years'): string {
     const arrival = new Date(`${arrivalDate}T00:00:00`);
-    if (!arrivalDate || Number.isNaN(arrival.getTime())) return ageAtArrival;
     const today = new Date();
-    let years = today.getFullYear() - arrival.getFullYear();
-    const anniversaryPending =
-      today.getMonth() < arrival.getMonth() ||
-      (today.getMonth() === arrival.getMonth() && today.getDate() < arrival.getDate());
-    if (anniversaryPending) years -= 1;
-    return ageAtArrival + Math.max(0, years);
+    let elapsedMonths = 0;
+    if (arrivalDate && !Number.isNaN(arrival.getTime())) {
+      elapsedMonths = (today.getFullYear() - arrival.getFullYear()) * 12 + today.getMonth() - arrival.getMonth();
+      if (today.getDate() < arrival.getDate()) elapsedMonths--;
+    }
+    const months = Math.round(ageAtArrival * (ageUnit === 'months' ? 1 : 12)) + Math.max(0, elapsedMonths);
+    const years = Math.floor(months / 12);
+    const remainingMonths = months % 12;
+    const yearLabel = `${years} ${years === 1 ? 'año' : 'años'}`;
+    const monthLabel = `${remainingMonths} ${remainingMonths === 1 ? 'mes' : 'meses'}`;
+    return years === 0 ? monthLabel : remainingMonths === 0 ? yearLabel : `${yearLabel} y ${monthLabel}`;
   }
 
   protected formCurrentAge(): string {
-    const age = this.form().age;
+    const { age, arrivalDate, ageMonths } = this.form();
     if (age === null) return 'Indica la edad al entrar';
-    const current = this.currentAge(age, this.form().arrivalDate);
-    return `${current} ${current === 1 ? 'año' : 'años'} actualmente`;
+    return `${this.currentAge(age * 12 + ageMonths, arrivalDate, 'months')} actualmente`;
   }
 
   private storySummary(story: string): string {
@@ -537,23 +552,31 @@ export class Dashboard implements OnInit {
     this.form.set({ ...initialForm, arrivalDate: new Date().toISOString().slice(0, 10) });
   }
 
-  protected addPhotos(event: Event): void {
+  protected async addPhotos(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
-    const selected = Array.from(input.files ?? []).filter((file) => file.type.startsWith('image/'));
-    const files = selected.filter((file) => file.size <= 15 * 1024 * 1024);
-
-    if (files.length !== selected.length) {
-      this.saveError.set('Cada imagen debe pesar menos de 15 MB antes de optimizarla.');
-    }
-
-    if (!files.length) {
-      return;
-    }
-
-    Promise.all(files.map((file) => this.compressPhoto(file))).then((photos) => {
-      this.form.update((current) => ({ ...current, photos: [...current.photos, ...photos] }));
+    if (this.optimizingPhotos()) return;
+    const selected = Array.from(input.files ?? []);
+    const errors: string[] = [];
+    this.optimizingPhotos.set(true);
+    this.saveError.set('');
+    try {
+      for (const file of selected) {
+        if (!file.type.startsWith('image/') || file.size > 15 * 1024 * 1024) {
+          errors.push(`${file.name}: selecciona una imagen de hasta 15 MB.`);
+          continue;
+        }
+        try {
+          const photo = await this.compressPhoto(file);
+          this.form.update((current) => ({ ...current, photos: [...current.photos, photo] }));
+        } catch {
+          errors.push(`No se pudo optimizar ${file.name}. Prueba con otra imagen.`);
+        }
+      }
+    } finally {
+      this.optimizingPhotos.set(false);
       input.value = '';
-    });
+      this.saveError.set(errors.join(' '));
+    }
   }
 
   protected removePhoto(index: number): void {
@@ -584,25 +607,47 @@ export class Dashboard implements OnInit {
     });
   }
 
-  private compressPhoto(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const image = new Image();
-        image.onload = () => {
-          const scale = Math.min(1, 1280 / Math.max(image.width, image.height));
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.round(image.width * scale);
-          canvas.height = Math.round(image.height * scale);
-          canvas.getContext('2d')?.drawImage(image, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL('image/webp', 0.78));
-        };
-        image.onerror = () => reject(new Error('No se pudo procesar la imagen.'));
-        image.src = String(reader.result);
-      };
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    });
+  private async compressPhoto(file: File): Promise<string> {
+    const url = URL.createObjectURL(file);
+    try {
+      const image = new Image();
+      await new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error('No se pudo leer la imagen.'));
+        image.src = url;
+      });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('No se pudo procesar la imagen.');
+      const maxBytes = 200 * 1024;
+      let maxDimension = 1280;
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = 'high';
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        for (const quality of [0.8, 0.7, 0.6]) {
+          let blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', quality));
+          if (!blob || blob.type !== 'image/webp') {
+            blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+          }
+          if (blob && blob.size <= maxBytes) {
+            return await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(String(reader.result));
+              reader.onerror = () => reject(reader.error);
+              reader.readAsDataURL(blob);
+            });
+          }
+        }
+        maxDimension = Math.round(maxDimension * 0.8);
+      }
+      throw new Error('No se pudo reducir el peso de la imagen.');
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
   protected statusLabel(status: AnimalStatus): string {

@@ -19,7 +19,7 @@
       const photos = Array.isArray(animal.photos) && animal.photos.length ? animal.photos : [''];
       const focusX = clampFocus(animal.photoFocusX);
       const focusY = clampFocus(animal.photoFocusY);
-      const age = currentAge(animal.age, animal.arrivalDate);
+      const age = currentAge(animal.age, animal.arrivalDate, animal.ageUnit);
       const photoButtons = photos.length > 1 ? `
             <button class="catalog-gallery-arrow catalog-gallery-prev" type="button" aria-label="Ver foto anterior de ${escapeHtml(animal.name)}">‹</button>
             <button class="catalog-gallery-arrow catalog-gallery-next" type="button" aria-label="Ver foto siguiente de ${escapeHtml(animal.name)}">›</button>
@@ -36,7 +36,7 @@
         </div>
         <div class="animal-info">
           <div><h3>${escapeHtml(animal.name)}</h3>
-          <p class="animal-tags"><span>${age} ${age === 1 ? 'año' : 'años'}</span><span>${escapeHtml(animal.sex)}</span><span>${escapeHtml(animal.size)}</span></p></div>
+          <p class="animal-tags"><span>${age}</span><span>${escapeHtml(animal.sex)}</span><span>${escapeHtml(animal.size)}</span></p></div>
           <button class="circle-button" type="button" aria-label="Ver a ${escapeHtml(animal.name)}">↗</button>
         </div>
       </article>`;
@@ -77,13 +77,20 @@
     return Number.isFinite(number) ? Math.min(100, Math.max(0, number)) : 50;
   }
 
-  function currentAge(ageAtArrival, arrivalDate) {
+  function currentAge(ageAtArrival, arrivalDate, ageUnit = 'years') {
     const arrival = new Date(`${arrivalDate}T00:00:00`);
-    if (!arrivalDate || Number.isNaN(arrival.getTime())) return ageAtArrival;
     const today = new Date();
-    let years = today.getFullYear() - arrival.getFullYear();
-    if (today.getMonth() < arrival.getMonth() || (today.getMonth() === arrival.getMonth() && today.getDate() < arrival.getDate())) years--;
-    return ageAtArrival + Math.max(0, years);
+    let elapsedMonths = 0;
+    if (arrivalDate && !Number.isNaN(arrival.getTime())) {
+      elapsedMonths = (today.getFullYear() - arrival.getFullYear()) * 12 + today.getMonth() - arrival.getMonth();
+      if (today.getDate() < arrival.getDate()) elapsedMonths--;
+    }
+    const months = Math.round(ageAtArrival * (ageUnit === 'months' ? 1 : 12)) + Math.max(0, elapsedMonths);
+    const years = Math.floor(months / 12);
+    const remainingMonths = months % 12;
+    const yearLabel = `${years} ${years === 1 ? 'año' : 'años'}`;
+    const monthLabel = `${remainingMonths} ${remainingMonths === 1 ? 'mes' : 'meses'}`;
+    return years === 0 ? monthLabel : remainingMonths === 0 ? yearLabel : `${yearLabel} y ${monthLabel}`;
   }
 
   function setupQuickGallery(gallery) {

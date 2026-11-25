@@ -148,7 +148,7 @@
 
           <div class="field-row three">
             <label>
-              Edad al entrar
+              Edad al entrar (años)
               <input
                 name="age"
                 required
@@ -156,8 +156,10 @@
               type="number"
               [class.input-invalid]="showValidation() && form().age === null"
                 [ngModel]="form().age"
-                (ngModelChange)="updateForm('age', $event === '' ? null : +$event)"
+                (ngModelChange)="updateForm('age', $event === '' || $event === null ? null : +$event)"
               />
+              <span>Meses (0 a 11)</span>
+              <input name="ageMonths" type="number" min="0" max="11" step="1" aria-label="Meses al entrar" [ngModel]="form().ageMonths" (ngModelChange)="updateForm('ageMonths', $event === null || $event === '' ? 0 : +$event)" />
             </label>
             <label>
               Sexo
@@ -302,8 +304,9 @@
 
           <div class="photo-field">
             <label for="animal-photos">Fotos de la mascota</label>
-            <input id="animal-photos" type="file" accept="image/*" multiple (change)="addPhotos($event)" />
-            <span>La primera foto será la principal. Máximo 15 MB por archivo; se reduce automáticamente a 1280 px y formato WebP.</span>
+            <input id="animal-photos" type="file" accept="image/*" multiple [disabled]="optimizingPhotos() || saving()" (change)="addPhotos($event)" />
+            <span>La primera foto será la principal. Hasta 15 MB por archivo: se optimiza antes de subir a un máximo de 1280 px y 200 KB por foto.</span>
+            @if (optimizingPhotos()) { <p role="status">Optimizando fotos…</p> }
 
             @if (form().photos.length) {
               <div class="photo-focus-editor">
@@ -338,8 +341,8 @@
             }
           </div>
 
-          <button class="submit-button" type="submit" [disabled]="saving()">
-            {{ saving() ? 'Guardando…' : editingId() ? 'Guardar cambios' : 'Registrar animal' }}
+          <button class="submit-button" type="submit" [disabled]="saving() || optimizingPhotos()">
+            {{ optimizingPhotos() ? 'Optimizando fotos…' : saving() ? 'Guardando…' : editingId() ? 'Guardar cambios' : 'Registrar animal' }}
           </button>
         </form>
       </section>
@@ -455,7 +458,7 @@
                     </td>
                     <td><strong>{{ animal.name }}</strong><small>{{ animal.breed }}</small></td>
                     <td>{{ animal.species }} · {{ animal.sex }}<small>{{ animal.size }} · {{ animal.weight || 'Sin peso' }}</small></td>
-                    <td><strong>{{ currentAge(animal.age, animal.arrivalDate) }} años</strong><small>Entró: {{ animal.arrivalDate }}</small></td>
+                    <td><strong>{{ currentAge(animal.age, animal.arrivalDate, animal.ageUnit) }}</strong><small>Entró: {{ animal.arrivalDate }}</small></td>
                     <td><div class="animal-labels">@if (animal.urgent) { <span class="status-pill urgent">Urgente</span> }<span class="status-pill" [class]="animal.status">{{ statusLabel(animal.status) }}</span></div></td>
                     <td><div class="table-actions"><button type="button" (click)="toggleAnimalDetails(animal.id)">{{ expandedAnimalId() === animal.id ? 'Cerrar' : 'Ver ficha' }}</button><button type="button" (click)="openPublicAnimal(animal)">Ver en web</button><button type="button" (click)="editAnimal(animal)">Editar</button><button class="danger" type="button" (click)="removeAnimal(animal.id)">Eliminar</button></div></td>
                   </tr>

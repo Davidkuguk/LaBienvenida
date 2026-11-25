@@ -9,6 +9,7 @@ export interface AnimalRecord {
   species: string;
   breed: string;
   age: number;
+  ageUnit?: 'years' | 'months';
   sex: 'Hembra' | 'Macho';
   size: 'Pequeno' | 'Mediano' | 'Grande';
   weight: string;

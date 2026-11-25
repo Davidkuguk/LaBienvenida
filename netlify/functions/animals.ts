@@ -57,8 +57,8 @@ function publicAnimal(animal: AnimalRecord): AnimalRecord {
 }
 
 function catalogAnimal(animal: AnimalRecord) {
-  const { id, name, species, age, sex, size, status, urgent, arrivalDate, photoFocusX, photoFocusY } = animal;
-  return { id, name, species, age, sex, size, status, urgent, arrivalDate, photoFocusX, photoFocusY, photos: publicAnimal(animal).photos };
+  const { id, name, species, age, ageUnit, sex, size, status, urgent, arrivalDate, photoFocusX, photoFocusY } = animal;
+  return { id, name, species, age, ageUnit, sex, size, status, urgent, arrivalDate, photoFocusX, photoFocusY, photos: publicAnimal(animal).photos };
 }
 
 function photoResponse(photo: string | undefined): Response {
@@ -92,6 +92,8 @@ function validAnimal(value: unknown): value is AnimalRecord {
       animal.species?.trim() &&
       animal.breed?.trim() &&
       Number.isFinite(animal.age) &&
+      animal.age! >= 0 &&
+      (animal.ageUnit === undefined || animal.ageUnit === 'years' || animal.ageUnit === 'months') &&
       Array.isArray(animal.photos),
   );
 }
